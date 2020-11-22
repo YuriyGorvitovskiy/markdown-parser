@@ -1,0 +1,23 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "declaration": true,
+        "lib": [
+            "es2020"
+        ],
+        "module": "commonjs",
+        "outDir": "./build",
+        "preserveConstEnums": false,
+        "resolveJsonModule": true,
+        "strict": false,
+        "target": "es5",
+        "sourceMap": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.test.ts"
+    ]
+}
