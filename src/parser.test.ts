@@ -14,6 +14,10 @@ const CODE_INLINE: ST.MarkType = {
     pattern: /\`(.+?)\`/,
     unbreakable: true
 }
+/*
+    "asd\n>123\n> 456\n789".split(/(?<=(?:^|\n))\>\s?(.+?(?:\n|$))/m): ["asd↵", "123↵", "", "456↵", "789"]
+    "asd\n>123\n> 456\n789".split(/(?<=(?:^|\n))((?:\>.+?(?:\n|$))+)/m): ["asd↵", ">123↵> 456↵", "789"]
+*/
 
 /*
    Example 12 _34 *56_ _78* 90_ AB (BOLD, ITALIC)
