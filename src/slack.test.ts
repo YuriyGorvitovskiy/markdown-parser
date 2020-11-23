@@ -247,15 +247,15 @@ Text:
 > :ru_shalm: is <http://toripota.com/img/ru_shalm.png>
 
 HTML
-"<a href=\"/@ru_shalm\" class=\"mention\">@ru_shalm</a> @U23456 <b>SlackMarkdown</b> is <code>text formatter</code> <i>gem</i> .<br><block'quote'>
-<img class=\"emoji\" title=\":ru_shalm:\" alt=\":ru_shalm:\" src=\"http://toripota.com/img/ru_shalm.png\" height=\"20\" width=\"20\" align=\"absmiddle\"> is <a href=\"http://localhost/?url=http%3A%2F%2Ftoripota.com%2Fimg%2Fru_shalm.png\" class=\"link\">http://toripota.com/img/ru_shalm.png</a><br>
-</block'quote'>"
+"<a href=\"/@ru_shalm\" class=\"mention\">@ru_shalm</a> @U23456 <b>SlackMarkdown</b> is <code>text formatter</code> <i>gem</i> .<br><blockquote>
+<img class=\"emoji\" title=\":ru_shalm:\" alt=\":ru_shalm:\" src=\"http://toripota.com/img/ru_shalm.png\" height=\"20\" width=\"20\" align=\"absmiddle\"> ~is~ <a href=\"http://localhost/?url=http%3A%2F%2Ftoripota.com%2Fimg%2Fru_shalm.png\" class=\"link\">http://toripota.com/img/ru_shalm.png</a><br>
+</blockquote>"
 */
 
 test("Slack parser", () => {
     // Setup
     const markdown = "<@U12345> <@U23456> *SlackMarkdown* is `text formatter` _gem_ .\n" +
-        "> :ru_shalm: is <http://toripota.com/img/ru_shalm.png>"
+        "> :ru_shalm: ~is~ <http://toripota.com/img/ru_shalm.png>"
 
     // Execute
     const result = parse(markdown, SLACK_RULES)
@@ -307,7 +307,16 @@ test("Slack parser", () => {
             content: "ru_shalm",
         }, {
             name: 'text',
-            content: " is ",
+            content: " ",
+        }, {
+            name: 'strike',
+            children: [{
+                name: 'text',
+                content: "is",
+            }],
+        }, {
+            name: 'text',
+            content: " ",
         }, {
             name: 'link',
             content: "http://toripota.com/img/ru_shalm.png",
