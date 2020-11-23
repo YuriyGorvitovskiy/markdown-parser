@@ -43,7 +43,7 @@ export const STRIKE: MarkRule<SlackMark> = {
 
 export const QUOTE: MarkRule<SlackMark> = {
     name: 'quote',
-    pattern: /(?<=(?:^|\n))\>\s?(.+?)(?:\n|$)/m,
+    pattern: /(?<=(?:^|\n))(?:\>|\&gt;)\s?(.+?)(?:\n|$)/m,
 }
 
 export const LINE_BREAK: MarkRule<SlackMark> = {
