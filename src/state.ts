@@ -1,3 +1,4 @@
+import { Mark } from "./mark"
 /**
     1. Split string by pattern1: [text1, match2, text3, match4, text5]
     2  Create MarkTree: [text1, m2: [text2], text3, m4: [text4], text5]
@@ -34,51 +35,30 @@
   \u001E character "Record Separator", marks ending of exposed group
   */
 
-export interface MarkType {
-    readonly name: string;
-    readonly pattern?: RegExp;
-    readonly unbreakable?: true;
-}
-
-export const TEXT: MarkType = {
-    name: "text",
-}
-
-export const ROOT: MarkType = {
-    name: "root",
-}
-
-export interface Mark {
-    readonly type: MarkType;
-    readonly content?: string;
-    readonly children?: Mark[];
-}
-
-
-export interface Level {
-    readonly unprocessed: Mark[];
-    readonly mark: Mark;
+export interface Level<M extends string> {
+    readonly unprocessed: Mark<M>[]
+    readonly mark: Mark<M>
 }
 
 // Alogorithm B Support
-export class State {
-    parents: Level[]
-    current: Level
+export class State<M extends string> {
+    parents: Level<M>[]
+    current: Level<M>
 
-    constructor(parents: Level[], current: Level) {
-        this.parents = parents;
-        this.current = current;
+    constructor(parents: Level<M>[], current: Level<M>) {
+        this.parents = parents
+        this.current = current
     }
 
-    addText(text: string): State {
+    addText(text: string): State<M> {
         if (text) {
-            this.current.mark.children.push({ type: TEXT, content: text })
+            this.current.mark.children.push({ name: 'text', content: text })
         }
         return this
     }
 
-    addActiveMark(mark: Mark): State {
-        const backup: Level[] = []
+    addActiveMark(mark: Mark<M>): State<M> {
+        const backup: Level<M>[] = []
         while (this.parents.length > 0) {
             backup.push(this.current)
             this.current = this.parents.pop()
@@ -89,24 +69,25 @@ export class State {
         this.current = { mark, unprocessed: this.current.unprocessed }
 
         while (backup.length > 0) {
-            this.parents.push(this.current);
+            this.parents.push(this.current)
             const back = backup.pop()
             const repeat = { ...back.mark, children: [] }
             this.current.mark.children.push(repeat)
             this.current = { mark: repeat, unprocessed: back.unprocessed }
         }
-        return this;
+        return this
     }
 
-    closeActiveMark(): State {
-        const backup: Level[] = []
+    closeActiveMark(): State<M> {
+        const backup: Level<M>[] = []
         while (this.parents.length > 0) {
             backup.push(this.current)
             this.current = this.parents.pop()
         }
-
-        while (backup.length > 1) {
-            this.parents.push(this.current);
+        // Active is now last in backup, current is 'root'
+        backup.pop()
+        while (backup.length > 0) {
+            this.parents.push(this.current)
             const back = backup.pop()
             const repeat = { ...back.mark, children: [] }
             this.current.mark.children.push(repeat)
@@ -115,34 +96,34 @@ export class State {
         return this
     }
 
-    addProcessedMarks(levels: number): State {
+    addProcessedMarks(levels: number): State<M> {
         while (levels-- > 0) {
             const next = this.current.unprocessed.shift()
             const repeat = { ...next, children: [] }
             this.current.mark.children.push(repeat)
-            this.parents.push(this.current);
+            this.parents.push(this.current)
 
-            this.current = { mark: repeat, unprocessed: next.children?.filter(m => m.type !== TEXT) }
+            this.current = { mark: repeat, unprocessed: next.children?.filter(m => m.name !== 'text') }
         }
         return this
     }
 
-    closeProcessedMarks(levels: number): State {
+    closeProcessedMarks(levels: number): State<M> {
         while (levels-- > 0) {
             this.current = this.parents.pop()
         }
 
-        return this;
+        return this
     }
 
-    getCurrentMark(): Mark {
-        return this.current.mark;
+    getCurrentMark(): Mark<M> {
+        return this.current.mark
     }
 
-    static of(processedRoot: Mark): State {
+    static of<M extends string>(processedRoot: Mark<M>): State<M> {
         return new State([], {
             mark: { ...processedRoot, children: [] },
-            unprocessed: [...processedRoot.children.filter(m => m.type !== TEXT)],
+            unprocessed: [...processedRoot.children.filter(m => m.name !== 'text')],
         })
     }
 }

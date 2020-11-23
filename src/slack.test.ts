@@ -1,134 +1,134 @@
-import * as MP from ".";
+import { parse, SLACK_RULES } from "."
 
 // Test sets comes from https://github.com/rutan/slack_markdown/tree/master/spec/slack_markdown
 test("Slack code-block parser.", () => {
     // Execute
-    const result1 = MP.parse("```\ndef hoge\n  1 + 1\nend\n```", MP.SLACK_RULES)
-    const result2 = MP.parse("```\ndef hoge\n  1 + 1\nend\n``` fuga ```\ndef piyo\n  1 * 1\nend\n```", MP.SLACK_RULES)
+    const result1 = parse("```\ndef hoge\n  1 + 1\nend\n```", SLACK_RULES)
+    const result2 = parse("```\ndef hoge\n  1 + 1\nend\n``` fuga ```\ndef piyo\n  1 * 1\nend\n```", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.CODE_BLOCK,
+        name: 'code-block',
         content: "def hoge\n  1 + 1\nend\n",
     }])
 
     expect(result2.children).toMatchObject([{
-        type: MP.CODE_BLOCK,
+        name: 'code-block',
         content: "def hoge\n  1 + 1\nend\n",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " fuga ",
     }, {
-        type: MP.CODE_BLOCK,
+        name: 'code-block',
         content: "def piyo\n  1 * 1\nend\n",
     }])
 })
 
 test("Slack code-inline parser.", () => {
     // Execute
-    const result1 = MP.parse("`hoge`", MP.SLACK_RULES)
-    const result2 = MP.parse("`hoge` fuga `piyo`", MP.SLACK_RULES)
+    const result1 = parse("`hoge`", SLACK_RULES)
+    const result2 = parse("`hoge` fuga `piyo`", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.CODE_INLINE,
+        name: 'code-inline',
         content: "hoge",
     }])
     expect(result2.children).toMatchObject([{
-        type: MP.CODE_INLINE,
+        name: 'code-inline',
         content: "hoge",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " fuga ",
     }, {
-        type: MP.CODE_INLINE,
+        name: 'code-inline',
         content: "piyo",
     }])
 })
 
 test("Slack link parser.", () => {
     // Execute
-    const result = MP.parse("123 <!456> 789", MP.SLACK_RULES)
+    const result = parse("123 <!456> 789", SLACK_RULES)
 
     // Verify
     expect(result.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "123 ",
     }, {
-        type: MP.LINK,
+        name: 'link',
         content: "!456",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " 789",
     }])
 })
 
 test("Slack emoji parser.", () => {
     // Execute
-    const result = MP.parse("123:smile-456:789", MP.SLACK_RULES)
+    const result = parse("123:smile-456:789", SLACK_RULES)
 
     // Verify
     expect(result.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "123",
     }, {
-        type: MP.EMOJI,
+        name: 'emoji',
         content: "smile-456",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: "789",
     }])
 })
 
-test("Slack quote parser.", () => {
+test("Slack 'quote' parser.", () => {
     // Execute
-    const result1 = MP.parse("> 123", MP.SLACK_RULES)
-    const result2 = MP.parse("> 123\n> 456", MP.SLACK_RULES)
-    const result3 = MP.parse("> 123\n>456\n789\n> ABC", MP.SLACK_RULES)
+    const result1 = parse("> 123", SLACK_RULES)
+    const result2 = parse("> 123\n> 456", SLACK_RULES)
+    const result3 = parse("> 123\n>456\n789\n> ABC", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "123",
         }]
     }])
     expect(result2.children).toMatchObject([{
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "123",
         }]
     }, {
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "456",
         }]
     }])
     expect(result3.children).toMatchObject([{
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "123",
         }]
     }, {
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "456",
         }]
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: "789",
     }, {
-        type: MP.LINE_BREAK,
+        name: 'line-break',
         content: "\n",
     }, {
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "ABC",
         }]
     }])
@@ -136,105 +136,105 @@ test("Slack quote parser.", () => {
 
 test("Slack bold parser.", () => {
     // Execute
-    const result1 = MP.parse("*hoge*", MP.SLACK_RULES)
-    const result2 = MP.parse("hoge*fuga*poyo", MP.SLACK_RULES)
-    const result3 = MP.parse("hoge *fuga* poyo", MP.SLACK_RULES)
+    const result1 = parse("*hoge*", SLACK_RULES)
+    const result2 = parse("hoge*fuga*poyo", SLACK_RULES)
+    const result3 = parse("hoge *fuga* poyo", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.BOLD,
+        name: 'bold',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "hoge",
         }]
     }])
 
     expect(result2.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge*fuga*poyo",
     }])
 
     expect(result3.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge ",
     }, {
-        type: MP.BOLD,
+        name: 'bold',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "fuga",
         }]
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " poyo",
     }])
 })
 
 test("Slack italic parser.", () => {
     // Execute
-    const result1 = MP.parse("_hoge_", MP.SLACK_RULES)
-    const result2 = MP.parse("hoge_fuga_poyo", MP.SLACK_RULES)
-    const result3 = MP.parse("hoge _fuga_ poyo", MP.SLACK_RULES)
+    const result1 = parse("_hoge_", SLACK_RULES)
+    const result2 = parse("hoge_fuga_poyo", SLACK_RULES)
+    const result3 = parse("hoge _fuga_ poyo", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.ITALIC,
+        name: 'italic',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "hoge",
         }]
     }])
 
     expect(result2.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge_fuga_poyo",
     }])
 
     expect(result3.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge ",
     }, {
-        type: MP.ITALIC,
+        name: 'italic',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "fuga",
         }]
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " poyo",
     }])
 })
 
 test("Slack strike parser.", () => {
     // Execute
-    const result1 = MP.parse("~hoge~", MP.SLACK_RULES)
-    const result2 = MP.parse("hoge~fuga~poyo", MP.SLACK_RULES)
-    const result3 = MP.parse("hoge ~fuga~ poyo", MP.SLACK_RULES)
+    const result1 = parse("~hoge~", SLACK_RULES)
+    const result2 = parse("hoge~fuga~poyo", SLACK_RULES)
+    const result3 = parse("hoge ~fuga~ poyo", SLACK_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
-        type: MP.STRIKE,
+        name: 'strike',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "hoge",
         }]
     }])
 
     expect(result2.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge~fuga~poyo",
     }])
 
     expect(result3.children).toMatchObject([{
-        type: MP.TEXT,
+        name: 'text',
         content: "hoge ",
     }, {
-        type: MP.STRIKE,
+        name: 'strike',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "fuga",
         }]
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " poyo",
     }])
 })
@@ -247,9 +247,9 @@ Text:
 > :ru_shalm: is <http://toripota.com/img/ru_shalm.png>
 
 HTML
-"<a href=\"/@ru_shalm\" class=\"mention\">@ru_shalm</a> @U23456 <b>SlackMarkdown</b> is <code>text formatter</code> <i>gem</i> .<br><blockquote>
+"<a href=\"/@ru_shalm\" class=\"mention\">@ru_shalm</a> @U23456 <b>SlackMarkdown</b> is <code>text formatter</code> <i>gem</i> .<br><block'quote'>
 <img class=\"emoji\" title=\":ru_shalm:\" alt=\":ru_shalm:\" src=\"http://toripota.com/img/ru_shalm.png\" height=\"20\" width=\"20\" align=\"absmiddle\"> is <a href=\"http://localhost/?url=http%3A%2F%2Ftoripota.com%2Fimg%2Fru_shalm.png\" class=\"link\">http://toripota.com/img/ru_shalm.png</a><br>
-</blockquote>"
+</block'quote'>"
 */
 
 test("Slack parser", () => {
@@ -258,58 +258,58 @@ test("Slack parser", () => {
         "> :ru_shalm: is <http://toripota.com/img/ru_shalm.png>"
 
     // Execute
-    const result = MP.parse(markdown, MP.SLACK_RULES)
+    const result = parse(markdown, SLACK_RULES)
 
     // Verify
     expect(result.children).toMatchObject([{
-        type: MP.LINK,
+        name: 'link',
         content: "@U12345",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " ",
     }, {
-        type: MP.LINK,
+        name: 'link',
         content: "@U23456",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " ",
     }, {
-        type: MP.BOLD,
+        name: 'bold',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "SlackMarkdown",
         }],
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " is ",
     }, {
-        type: MP.CODE_INLINE,
+        name: 'code-inline',
         content: "text formatter",
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " ",
     }, {
-        type: MP.ITALIC,
+        name: 'italic',
         children: [{
-            type: MP.TEXT,
+            name: 'text',
             content: "gem",
         }],
     }, {
-        type: MP.TEXT,
+        name: 'text',
         content: " .",
     }, {
-        type: MP.LINE_BREAK,
+        name: 'line-break',
         content: "\n",
     }, {
-        type: MP.QUOTE,
+        name: 'quote',
         children: [{
-            type: MP.EMOJI,
+            name: 'emoji',
             content: "ru_shalm",
         }, {
-            type: MP.TEXT,
+            name: 'text',
             content: " is ",
         }, {
-            type: MP.LINK,
+            name: 'link',
             content: "http://toripota.com/img/ru_shalm.png",
         }]
     },])

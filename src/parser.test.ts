@@ -1,16 +1,18 @@
-import * as ST from "./state";
-import * as PR from "./parser";
+import { Mark, MarkRule } from "./mark"
+import { parse } from "./parser"
 
-const BOLD: ST.MarkType = {
-    name: "bold",
+type SL = 'bold' | 'italic' | 'code-inline'
+
+const BOLD: MarkRule<SL> = {
+    name: 'bold',
     pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
 }
-const ITALIC: ST.MarkType = {
-    name: "bold",
+const ITALIC: MarkRule<SL> = {
+    name: 'italic',
     pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
 }
-const CODE_INLINE: ST.MarkType = {
-    name: "code-inline",
+const CODE_INLINE: MarkRule<SL> = {
+    name: 'code-inline',
     pattern: /\`(.+?)\`/,
     unbreakable: true
 }
@@ -32,112 +34,112 @@ const CODE_INLINE: ST.MarkType = {
 
 test("Parse with BOLD pattern", () => {
     // Execute
-    const result = PR.parse("12 _34 *56_ _78* 90_ AB", [BOLD]);
+    const result = parse("12 _34 *56_ _78* 90_ AB", [BOLD])
 
     // Verify 
     expect(result.children).toMatchObject([{
-        type: ST.TEXT,
+        name: 'text',
         content: "12 _34 ",
     }, {
-        type: BOLD,
+        name: 'bold',
         children: [{
-            type: ST.TEXT,
+            name: 'text',
             content: "56_ _78"
         }],
     }, {
-        type: ST.TEXT,
+        name: 'text',
         content: " 90_ AB",
     }])
 })
 
 test("Parse with BOLD + ITALIC patterns", () => {
-    const result = PR.parse("12 _34 *56_ _78* 90_ AB", [BOLD, ITALIC]);
+    const result = parse("12 _34 *56_ _78* 90_ AB", [BOLD, ITALIC])
 
     // Verify
     expect(result.children).toMatchObject([{
-        type: ST.TEXT,
+        name: 'text',
         content: "12 ",
     }, {
-        type: ITALIC,
+        name: 'italic',
         children: [{
-            type: ST.TEXT,
+            name: 'text',
             content: "34 "
         }, {
-            type: BOLD,
+            name: 'bold',
             children: [{
-                type: ST.TEXT,
+                name: 'text',
                 content: "56"
             }]
         }],
     }, {
-        type: BOLD,
+        name: 'bold',
         children: [{
-            type: ST.TEXT,
+            name: 'text',
             content: " "
         }]
     }, {
-        type: ITALIC,
+        name: 'italic',
         children: [{
-            type: BOLD,
+            name: 'bold',
             children: [{
-                type: ST.TEXT,
+                name: 'text',
                 content: "78"
             }]
         }, {
-            type: ST.TEXT,
+            name: 'text',
             content: " 90"
         }],
     }, {
-        type: ST.TEXT,
+        name: 'text',
         content: " AB",
     }])
 })
 
 test("Parse with CODE_INLINE + BOLD patterns V1", () => {
     // Execute
-    const result = PR.parse("12 *34 `56 78*` 90* AB", [CODE_INLINE, BOLD]);
+    const result = parse("12 *34 `56 78*` 90* AB", [CODE_INLINE, BOLD])
 
     // Verify 
     expect(result.children).toMatchObject([{
-        type: ST.TEXT,
+        name: 'text',
         content: "12 ",
     }, {
-        type: BOLD,
+        name: 'bold',
         children: [{
-            type: ST.TEXT,
+            name: 'text',
             content: "34 "
         }, {
-            type: CODE_INLINE,
+            name: 'code-inline',
             content: "56 78*"
         }, {
-            type: ST.TEXT,
+            name: 'text',
             content: " 90"
         }],
     }, {
-        type: ST.TEXT,
+        name: 'text',
         content: " AB",
     }])
 })
 
 test("Parse with CODE_INLINE + BOLD patterns V2", () => {
     // Execute
-    const result = PR.parse("12 *34 `56 78`* 90* AB", [CODE_INLINE, BOLD]);
+    const result = parse("12 *34 `56 78`* 90* AB", [CODE_INLINE, BOLD])
 
     // Verify 
     expect(result.children).toMatchObject([{
-        type: ST.TEXT,
+        name: 'text',
         content: "12 ",
     }, {
-        type: BOLD,
+        name: 'bold',
         children: [{
-            type: ST.TEXT,
+            name: 'text',
             content: "34 "
         }, {
-            type: CODE_INLINE,
+            name: 'code-inline',
             content: "56 78"
         }],
     }, {
-        type: ST.TEXT,
+        name: 'text',
         content: " 90* AB",
     }])
 })
