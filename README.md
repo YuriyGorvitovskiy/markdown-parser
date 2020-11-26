@@ -4,8 +4,8 @@
 
 Couple cases to consider when 2 rules are applied in different order.
 
-* Rule1 - rule processed first, rule boundaies `{x}` should be converted tags `<a>x</a>`
-* Rule2 - rule processed second `[x]` should be converted tags `<b>x</b>`
+* Rule1 - rule processed first, rule boundaies `{x}` should be converted to tags `<a>x</a>`
+* Rule2 - rule processed second `[x]` should be converted to tags `<b>x</b>`
 
 ## Case 1
 
