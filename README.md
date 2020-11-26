@@ -55,7 +55,7 @@ When external Mark inside Rule2 closed:
 That will required to switch implementation from string.split(...) to regexp.exec(...) 
 
 ### Allow rules to process matching
-Each rule should define function `process: (matches: string[]) => {mark: Mark, text: string}`:
+Each Rule interface should define function `process: (matches: string[]) => {mark: Mark, text: string}`:
 * mark - a new Mark to be added
 * text - internal text inside mark
 * null - didn't match, treat `match[0]` as text, without new mark to be added 
