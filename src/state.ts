@@ -38,6 +38,7 @@ import { Mark } from "./mark"
 export interface Level<M extends string> {
     readonly unprocessed: Mark<M>[]
     readonly mark: Mark<M>
+    readonly secondary?: boolean
 }
 
 // Alogorithm B Support
@@ -75,8 +76,13 @@ export class State<M extends string> {
             this.current = this.parents.pop()
         }
         // close active
+        const ended = this.current;
         this.current = this.parents.pop()
         this.active = null
+        if (ended.secondary && !ended.mark.children.length) {
+            // remove secondary & empty mark
+            this.current.mark.children.pop()
+        }
 
         // reopen marks we preserved in stack in reverse order
         while (backup.length > 0) {
@@ -84,7 +90,7 @@ export class State<M extends string> {
             const repeat = { ...back.mark, children: [] }
             this.current.mark.children.push(repeat)
             this.parents.push(this.current)
-            this.current = { mark: repeat, unprocessed: back.unprocessed }
+            this.current = { mark: repeat, unprocessed: back.unprocessed, secondary: true }
         }
         return this
     }
@@ -111,7 +117,12 @@ export class State<M extends string> {
                 this.current = this.parents.pop()
                 activeClosed = true
             }
+            const ended = this.current;
             this.current = this.parents.pop()
+            if (ended.secondary && !ended.mark.children.length) {
+                // remove secondary & empty mark
+                this.current.mark.children.pop()
+            }
         }
 
         if (activeClosed) {
@@ -119,7 +130,7 @@ export class State<M extends string> {
             const repeat = { ...this.active.mark, children: [] }
             this.current.mark.children.push(repeat)
             this.parents.push(this.current)
-            this.active = this.current = { mark: repeat, unprocessed: this.active.unprocessed }
+            this.active = this.current = { mark: repeat, unprocessed: this.active.unprocessed, secondary: true }
         }
 
         return this

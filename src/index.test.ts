@@ -55,4 +55,36 @@ test("[x{y]z} => <b>x<a>y</a></b><a>z</a>", () => {
 
     // Verify
     expect(dump(result)).toEqual("<b>x<a>y</a></b><a>z</a>");
+})
+
+test("{[x]} => <a><b>x</b></a>", () => {
+    // Execute
+    const result = parse("{[x]}", TEST_RULES)
+
+    // Verify
+    expect(dump(result)).toEqual("<a><b>x</b></a>");
+})
+
+test("[{x}] => <b><a>x</a></b>", () => {
+    // Execute
+    const result = parse("[{x}]", TEST_RULES)
+
+    // Verify
+    expect(dump(result)).toEqual("<b><a>x</a></b>");
+})
+
+test("{[x}] => <a><b>x</b></a>", () => {
+    // Execute
+    const result = parse("{[x}]", TEST_RULES)
+
+    // Verify
+    expect(dump(result)).toEqual("<a><b>x</b></a>");
+})
+
+test("[{x]} => <b><a>x</a></b>", () => {
+    // Execute
+    const result = parse("[{x]}", TEST_RULES)
+
+    // Verify
+    expect(dump(result)).toEqual("<b><a>x</a></b>");
 }) 
