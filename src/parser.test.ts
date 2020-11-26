@@ -76,16 +76,16 @@ test("Parse with BOLD + ITALIC patterns", () => {
         children: [{
             name: 'text',
             content: " "
-        }]
-    }, {
-        name: 'italic',
-        children: [{
-            name: 'bold',
+        }, {
+            name: 'italic',
             children: [{
                 name: 'text',
                 content: "78"
             }]
-        }, {
+        }]
+    }, {
+        name: 'italic',
+        children: [{
             name: 'text',
             content: " 90"
         }],
@@ -143,3 +143,5 @@ test("Parse with CODE_INLINE + BOLD patterns V2", () => {
         content: " 90* AB",
     }])
 })
+
+
