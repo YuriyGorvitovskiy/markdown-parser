@@ -45,7 +45,7 @@ When external Mark inside Rule2 closed:
 
 ### Proposed implementation:
 1. If Mark was split, then all non-first parts of the split, will be marked secondary. 
-1. All secondary marks without and children can be safely removed
+1. All secondary marks without any children can be safely removed
 
 * `{[x}]` => `<a>[z</a>]` => `<a><b>x</b></a>`
 * `[{x]}` => `[<a>x]</a>` => `<b><a>x</a></b>`
@@ -61,4 +61,9 @@ Each rule should define function `process: (matches: string[]) => {mark: Mark, t
 * null - didn't match, treat `match[0]` as text, without new mark to be added 
 
 Provide simple function implementation to handle single matching group.
+
+### Allow to customize Mark class
+Each Mark, base on the rule, may required additional fields. 
+Also, if somebody would like to extend interface with extra fields for future processing (like rendering) (s)he should be able to do so.
+In this case we should also consider to extend rule process function to inject new fields. 
 
