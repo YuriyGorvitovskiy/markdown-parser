@@ -63,6 +63,27 @@ test("Slack link parser.", () => {
     }])
 })
 
+test("Slack link with text parser.", () => {
+    // Execute
+    const result = parse("123 <!4|56> 789", SLACK_RULES)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: 'text',
+        content: "123 ",
+    }, {
+        name: 'link',
+        content: "!4",
+        children: [{
+            name: 'text',
+            content: "56",
+        }]
+    }, {
+        name: 'text',
+        content: " 789",
+    }])
+})
+
 test("Slack emoji parser.", () => {
     // Execute
     const result = parse("123:smile-456:789", SLACK_RULES)
@@ -255,7 +276,7 @@ HTML
 test("Slack parser", () => {
     // Setup
     const markdown = "<@U12345> <@U23456> *SlackMarkdown* is `text formatter` _gem_ .\n" +
-        "> :ru_shalm: ~is~ <http://toripota.com/img/ru_shalm.png>"
+        "> :ru_shalm: ~is~ <http://toripota.com/img/ru_shalm.png|`Code💬`*Foxy* girl>"
 
     // Execute
     const result = parse(markdown, SLACK_RULES)
@@ -320,6 +341,19 @@ test("Slack parser", () => {
         }, {
             name: 'link',
             content: "http://toripota.com/img/ru_shalm.png",
+            children: [{
+                name: 'code-inline',
+                content: "Code💬",
+            }, {
+                name: 'bold',
+                children: [{
+                    name: 'text',
+                    content: "Foxy",
+                }],
+            }, {
+                name: 'text',
+                content: " girl",
+            }]
         }]
     },])
 })

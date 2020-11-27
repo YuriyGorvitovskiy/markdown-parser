@@ -7,6 +7,7 @@ export const CODE_BLOCK: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)```\n?([^\u001D\u001E]+?)```(?=\W|$)/m,
     process: contentFromGroup1('code-block'),
 }
+
 export const CODE_INLINE: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /(?<=^|\W)`([^\u001D\u001E\n]+?)`(?=\W|$)/,
@@ -14,9 +15,9 @@ export const CODE_INLINE: MarkRule<SlackMark> = {
 }
 
 export const LINK: MarkRule<SlackMark> = {
-    // all markdown inside should be ignored 
-    pattern: /<([^\u001D\u001E]+?)>/,
-    process: contentFromGroup1('link'),
+    // all markdown inside href part should be ignored 
+    pattern: /<([^\u001D\u001E]+?)(?:\|(.+?))?>/,
+    process: (m) => ({ mark: { name: 'link', content: m[1], children: [] }, text: m[2] }),
 }
 
 export const EMOJI: MarkRule<SlackMark> = {
