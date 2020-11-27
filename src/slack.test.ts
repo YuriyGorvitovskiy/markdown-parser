@@ -120,10 +120,9 @@ test("Slack 'quote' parser.", () => {
         children: [{
             name: 'text',
             content: "123",
-        }]
-    }, {
-        name: 'quote',
-        children: [{
+        }, {
+            name: 'line-break'
+        }, {
             name: 'text',
             content: "456",
         }]
@@ -133,19 +132,19 @@ test("Slack 'quote' parser.", () => {
         children: [{
             name: 'text',
             content: "123",
-        }]
-    }, {
-        name: 'quote',
-        children: [{
+        }, {
+            name: 'line-break'
+        }, {
             name: 'text',
             content: "456",
+        }, {
+            name: 'line-break'
         }]
     }, {
         name: 'text',
         content: "789",
     }, {
         name: 'line-break',
-        content: "\n",
     }, {
         name: 'quote',
         children: [{
@@ -320,7 +319,6 @@ test("Slack parser", () => {
         content: " .",
     }, {
         name: 'line-break',
-        content: "\n",
     }, {
         name: 'quote',
         children: [{
