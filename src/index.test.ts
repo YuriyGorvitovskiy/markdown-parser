@@ -1,17 +1,17 @@
-import { Mark, MarkRule, parse } from "."
+import { Mark, MarkRule, parse, textFromMatch } from "."
 
 type TEST = 'a' | 'b'
 
 // Rule1 - rule processed first, rule boundaies {x} should be converted to tags <a>x</a>
 const RULE_1: MarkRule<TEST> = {
-    name: 'a',
     pattern: /\{(.+?)\}/,
+    process: textFromMatch('a')
 }
 
 // Rule2 - rule processed second, rule boundaies [x] should be converted to tags <b>x</b>
 const RULE_2: MarkRule<TEST> = {
-    name: 'b',
     pattern: /\[(.+?)\]/,
+    process: textFromMatch('b')
 }
 
 const TEST_RULES = [RULE_1, RULE_2]
