@@ -27,23 +27,19 @@ const processText = <M extends string>(state: State<M>, text: string): State<M> 
 
 const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): Mark<M> => {
     const state = State.of(root)
-    const text = mergeMarkText(root)
+    const combo = mergeMarkText(root)
 
-    return text.split(rule.pattern)
-        .reduce((s, t, ii) => {
-            if (ii % 2) {
-                if (rule.unbreakable) {
-                    s.addActiveMark({ name: rule.name, content: t })
-                } else {
-                    s.addActiveMark({ name: rule.name, children: [] })
-                    processText(s, t)
-                }
-                return s.closeActiveMark()
-            } else {
-                return processText(s, t)
-            }
-        }, state)
-        .getCurrentMark()
+    const regex = new RegExp(rule.pattern, 'g')
+    let prevIndex = 0
+    for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
+        processText(state, combo.substring(prevIndex, match.index))
+        const { mark, text } = rule.process(match)
+        mark && state.addActiveMark(mark)
+        text && processText(state, text)
+        mark && state.closeActiveMark()
+    }
+    processText(state, combo.substring(prevIndex))
+    return state.getCurrentMark()
 }
 
 export const parse = <M extends string>(text: string, rules: MarkRule<M>[]): Mark<M> => {

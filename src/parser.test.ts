@@ -1,20 +1,19 @@
-import { Mark, MarkRule } from "./mark"
+import { MarkRule, textFromGroup1, contentFromGroup1 } from "./mark"
 import { parse } from "./parser"
 
 type SL = 'bold' | 'italic' | 'code-inline'
 
 const BOLD: MarkRule<SL> = {
-    name: 'bold',
     pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
+    process: textFromGroup1('bold')
 }
 const ITALIC: MarkRule<SL> = {
-    name: 'italic',
     pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
+    process: textFromGroup1('italic')
 }
 const CODE_INLINE: MarkRule<SL> = {
-    name: 'code-inline',
     pattern: /\`(.+?)\`/,
-    unbreakable: true
+    process: contentFromGroup1('code-inline')
 }
 /*
     "asd\n>123\n> 456\n789".split(/(?<=(?:^|\n))\>\s?(.+?(?:\n|$))/m): ["asd↵", "123↵", "", "456↵", "789"]
@@ -76,16 +75,16 @@ test("Parse with BOLD + ITALIC patterns", () => {
         children: [{
             name: 'text',
             content: " "
-        }]
-    }, {
-        name: 'italic',
-        children: [{
-            name: 'bold',
+        }, {
+            name: 'italic',
             children: [{
                 name: 'text',
                 content: "78"
             }]
-        }, {
+        }]
+    }, {
+        name: 'italic',
+        children: [{
             name: 'text',
             content: " 90"
         }],
@@ -143,3 +142,5 @@ test("Parse with CODE_INLINE + BOLD patterns V2", () => {
         content: " 90* AB",
     }])
 })
+
+

@@ -91,16 +91,16 @@ test("State manipulation BOLD + ITALIC Pass 2", () => {
         children: [{
             name: 'text',
             content: " "
-        }]
-    }, {
-        name: 'italic',
-        children: [{
-            name: 'bold',
+        }, {
+            name: 'italic',
             children: [{
                 name: 'text',
                 content: "78"
             }]
-        }, {
+        }]
+    }, {
+        name: 'italic',
+        children: [{
             name: 'text',
             content: " 90"
         }],
