@@ -7,7 +7,7 @@ For example:
 
 Some implementation like Slack treat it as valid and render as: _abc_ _**def**_ **ghi**
 
-Other like GitHub treat it as partialy vaid on clean rendering: _abc **def_ ghi**
+Other like GitHub treat it as partialy valid on clean rendering: _abc **def_ ghi**
 
 ## Parsing Interface
 
@@ -85,16 +85,15 @@ Parser is using special characters to be injected in the text before pattern is 
 * \u001E character "Record Separator", marks the end of mark found in previous Rule pass
 
 
-## Parsing Suggestions
+## Parsing Implementation
 
 Couple cases to consider when 2 rules are applied in different order.
 
 * Rule1 - rule processed first, rule boundaies `{x}` should be converted to tags `<a>x</a>`
 * Rule2 - rule processed second `[x]` should be converted to tags `<b>x</b>`
 
-## Case 1
+### Case 1
 
-### 2.3.2 Implementation:
 When Rule2 applied it:
 1. Adds opening Mark for Rule2
 
@@ -108,18 +107,17 @@ When external Mark inside Rule2 closed:
 * `{x[y}z]` => `<a>x[y</a>z]` => `<a>x<b>y</b></a><b>z</b>`
 * `[x{y]z}` => `[x<a>y]z</a>` => `<b>x<a>y</a></b><a>z</a>`
 
-## Case 2
+### Case 2
 
-### 2.3.2 Implementation:
 1. If Mark was split, then all non-first parts of the split, will be marked secondary. 
 1. All secondary marks without any children can be safely removed
 
 * `{[x}]` => `<a>[z</a>]` => `<a><b>x</b></a>`
 * `[{x]}` => `[<a>x]</a>` => `<b><a>x</a></b>`
 
-## Code improvements
+### Code improvements
 
-### Allow multiple matching groups per Rule
+#### Allow multiple matching groups per Rule
 
 Parser implementation uses ```regexp.exec(...)``` function and adds *global* flag to pattern. 
 
