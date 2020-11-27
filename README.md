@@ -120,7 +120,9 @@ When external Mark inside Rule2 closed:
 ## Code improvements
 
 ### Allow multiple matching groups per Rule
+
 Parser implementation uses ```regexp.exec(...)``` function and adds *global* flag to pattern. 
+
 Provide simple function implementation to handle single matching group.
 
 
