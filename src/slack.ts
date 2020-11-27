@@ -41,15 +41,19 @@ export const STRIKE: MarkRule<SlackMark> = {
     process: textFromGroup1('strike'),
 }
 
+const QUOTE_EXTRACT = /^>\s?/m
 export const QUOTE: MarkRule<SlackMark> = {
-    pattern: /(?<=(?:^|\n))(?:\>|\&gt;)\s?(.+?)(?:\n|$)/m,
-    process: textFromGroup1('quote'),
+    pattern: /(?<=(?:^|\n))((?:\>[^\n]+?(?:\n|$))+)/m,
+    process: (m) => ({
+        mark: { name: 'quote', children: [] },
+        text: m[0].split(QUOTE_EXTRACT).join("")
+    }),
 }
 
 export const LINE_BREAK: MarkRule<SlackMark> = {
     // no rules inside
-    pattern: /(\n)/m,
-    process: contentFromGroup1('line-break'),
+    pattern: /\n/m,
+    process: (m) => ({ mark: { name: 'line-break' }, text: null }),
 }
 
 
