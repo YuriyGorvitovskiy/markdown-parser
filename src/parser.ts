@@ -29,19 +29,17 @@ const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): M
     const state = State.of(root)
     const combo = mergeMarkText(root)
 
-    return combo.split(rule.pattern)
-        .reduce((s, t, ii) => {
-            if (ii % 2) {
-                const { mark, text } = rule.process(t)
-                mark && s.addActiveMark(mark)
-                text && processText(s, text)
-                mark && s.closeActiveMark()
-            } else {
-                t && processText(s, t)
-            }
-            return s
-        }, state)
-        .getCurrentMark()
+    const regex = new RegExp(rule.pattern, 'g')
+    let prevIndex = 0
+    for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
+        processText(state, combo.substring(prevIndex, match.index))
+        const { mark, text } = rule.process(match)
+        mark && state.addActiveMark(mark)
+        text && processText(state, text)
+        mark && state.closeActiveMark()
+    }
+    processText(state, combo.substring(prevIndex))
+    return state.getCurrentMark()
 }
 
 export const parse = <M extends string>(text: string, rules: MarkRule<M>[]): Mark<M> => {

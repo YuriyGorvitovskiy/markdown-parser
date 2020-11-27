@@ -1,54 +1,54 @@
-import { MarkRule, contentFromMatch, textFromMatch } from "./mark"
+import { MarkRule, contentFromGroup1, textFromGroup1 } from "./mark"
 
 export type SlackMark = 'code-block' | 'code-inline' | 'link' | 'emoji' | 'quote' | 'line-break' | 'bold' | 'italic' | 'strike'
 
 export const CODE_BLOCK: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /(?<=^|\W)```\n?([^\u001D\u001E]+?)```(?=\W|$)/m,
-    process: contentFromMatch('code-block'),
+    process: contentFromGroup1('code-block'),
 }
 export const CODE_INLINE: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /(?<=^|\W)`([^\u001D\u001E\n]+?)`(?=\W|$)/,
-    process: contentFromMatch('code-inline'),
+    process: contentFromGroup1('code-inline'),
 }
 
 export const LINK: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /<([^\u001D\u001E]+?)>/,
-    process: contentFromMatch('link'),
+    process: contentFromGroup1('link'),
 }
 
 export const EMOJI: MarkRule<SlackMark> = {
     // all markdown inside should be ignored
     pattern: /:([a-z0-9-+_]+):/,
-    process: contentFromMatch('emoji'),
+    process: contentFromGroup1('emoji'),
 }
 
 export const BOLD: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
-    process: textFromMatch('bold'),
+    process: textFromGroup1('bold'),
 }
 
 export const ITALIC: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
-    process: textFromMatch('italic'),
+    process: textFromGroup1('italic'),
 }
 
 export const STRIKE: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)\~(.+?)\~(?=\W|$)/,
-    process: textFromMatch('strike'),
+    process: textFromGroup1('strike'),
 }
 
 export const QUOTE: MarkRule<SlackMark> = {
     pattern: /(?<=(?:^|\n))(?:\>|\&gt;)\s?(.+?)(?:\n|$)/m,
-    process: textFromMatch('quote'),
+    process: textFromGroup1('quote'),
 }
 
 export const LINE_BREAK: MarkRule<SlackMark> = {
     // no rules inside
     pattern: /(\n)/m,
-    process: contentFromMatch('line-break'),
+    process: contentFromGroup1('line-break'),
 }
 
 
