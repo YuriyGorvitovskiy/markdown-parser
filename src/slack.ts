@@ -2,47 +2,47 @@ import { MarkRule, contentFromGroup1, textFromGroup1 } from "./mark"
 
 export type SlackMark = 'code-block' | 'code-inline' | 'link' | 'emoji' | 'quote' | 'line-break' | 'bold' | 'italic' | 'strike'
 
-export const CODE_BLOCK: MarkRule<SlackMark> = {
+const CODE_BLOCK: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /(?<=^|\W)```\n?([^\u001D\u001E]+?)```(?=\W|$)/m,
     process: contentFromGroup1('code-block'),
 }
 
-export const CODE_INLINE: MarkRule<SlackMark> = {
+const CODE_INLINE: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
     pattern: /(?<=^|\W)`([^\u001D\u001E\n]+?)`(?=\W|$)/,
     process: contentFromGroup1('code-inline'),
 }
 
-export const LINK: MarkRule<SlackMark> = {
+const LINK: MarkRule<SlackMark> = {
     // all markdown inside href part should be ignored 
     pattern: /<([^\u001D\u001E]+?)(?:\|(.+?))?>/,
     process: (m) => ({ mark: { name: 'link', content: m[1], children: [] }, text: m[2] }),
 }
 
-export const EMOJI: MarkRule<SlackMark> = {
+const EMOJI: MarkRule<SlackMark> = {
     // all markdown inside should be ignored
     pattern: /:([a-z0-9-+_]+):/,
     process: contentFromGroup1('emoji'),
 }
 
-export const BOLD: MarkRule<SlackMark> = {
+const BOLD: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
     process: textFromGroup1('bold'),
 }
 
-export const ITALIC: MarkRule<SlackMark> = {
+const ITALIC: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
     process: textFromGroup1('italic'),
 }
 
-export const STRIKE: MarkRule<SlackMark> = {
+const STRIKE: MarkRule<SlackMark> = {
     pattern: /(?<=^|\W)\~(.+?)\~(?=\W|$)/,
     process: textFromGroup1('strike'),
 }
 
 const QUOTE_EXTRACT = /^>\s?/m
-export const QUOTE: MarkRule<SlackMark> = {
+const QUOTE: MarkRule<SlackMark> = {
     pattern: /(?<=(?:^|\n))((?:\>[^\n]+?(?:\n|$))+)/m,
     process: (m) => ({
         mark: { name: 'quote', children: [] },
@@ -50,7 +50,7 @@ export const QUOTE: MarkRule<SlackMark> = {
     }),
 }
 
-export const LINE_BREAK: MarkRule<SlackMark> = {
+const LINE_BREAK: MarkRule<SlackMark> = {
     // no rules inside
     pattern: /\n/m,
     process: (m) => ({ mark: { name: 'line-break' }, text: null }),
