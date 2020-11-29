@@ -125,3 +125,15 @@ Provide simple function implementation to handle single matching group.
 
 
 ## Slack
+
+https://api.slack.com/reference/surfaces/formatting
+
+[Implementation Details](Slack.md)
+
+## Daring Fireball
+
+https://daringfireball.net/projects/markdown/syntax#autolink
+
+## GitHub 
+
+https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown
