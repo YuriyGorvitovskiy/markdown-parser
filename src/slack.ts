@@ -56,8 +56,6 @@ export const LINE_BREAK: MarkRule<SlackMark> = {
     process: (m) => ({ mark: { name: 'line-break' }, text: null }),
 }
 
-
-
 /*
     Rules order dictates tags containement in the tree
     The Rule at the end of the array will be parents of the Rule at the beginning of the array.
@@ -65,12 +63,12 @@ export const LINE_BREAK: MarkRule<SlackMark> = {
 export const SLACK_RULES = [
     CODE_BLOCK, // Code block encapsulate multiple lines, and should run first
     CODE_INLINE, // CODE_INLINE should follow CODE_BLOCK, because CODE_INLINE pattern also match CODE_BLOCK pattern 
+    QUOTE,
     LINK, // LINK should follow CODE_XXX rules, LINK pattern should be ignored in CODE_XXX
     EMOJI, // EMOJI should follow CODE_XXX & LINK rules, because EMOJI pattern should be ignored in CODE_XXX & LINK
     BOLD, // BOLD, ITALIC, STRIKE can come in any order, and should follow CODE_XXX, LINK, EMOJI and other unbreakable blocks
     ITALIC,
     STRIKE,
-    QUOTE, // QUITE should follow all rules but LINE_BREAK, to preserve formating inside quote
     LINE_BREAK, // LINE_BREAK should be last, because beacause all rules patterns are line base, so we should keep \n to apply all rules properly.
 ]
 
