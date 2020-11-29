@@ -2,6 +2,8 @@ export interface Mark<M extends string> {
     readonly name: M | 'text' | 'root'
     readonly content?: string
     readonly children?: Mark<M>[]
+    readonly recursive?: boolean
+    readonly unbreakable?: boolean
 }
 
 type PatternHandler<M extends string> = (match: string[]) => { mark: Mark<M>, text: string };
