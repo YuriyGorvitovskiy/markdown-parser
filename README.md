@@ -173,141 +173,7 @@ Code string surrounded with \` symbols. All content inside should be preserved a
 }
 ```
 
-### 3. Link 
-String surrounded with \< \> symbols  with optional \| separator for presentation part
-
-#### Pattern
-``` /<([^\u001D\u001E]+?)(?:\|(.+?))?>/ ```
-
-#### Example
-``` 123 <!456> 789 ```
-
-```javascript
-{
-  name: 'root',
-  children: [{
-    name: 'text',
-    content: "123 ",
-  }, {
-    name: 'link',
-    content: "!456",
-  }, {
-    name: 'text',
-    content: " 789",
-  }]
-}
-```
-
-### 4. Emoji 
-String surrounded with \: symbols
-
-#### Pattern
-``` /:([a-z0-9-+_]+):/ ```
-
-#### Example
-``` 123:smile-456:789 ```
-
-```javascript
-{
-  name: 'root',
-  children: [{
-        name: 'text',
-        content: "123",
-    }, {
-        name: 'emoji',
-        content: "smile-456",
-    }, {
-        name: 'text',
-        content: "789",
-    }]
-}
-```
-
-### 5. Bold 
-String surrounded with \* symbols
-
-#### Pattern
-``` /(?<=^|\W)\*(.+?)\*(?=\W|$)/ ```
-
-#### Example
-``` hoge *fuga* poyo ```
-
-```javascript
-{
-  name: 'root',
-  children: [{
-        name: 'text',
-        content: "hoge ",
-    }, {
-        name: 'bold',
-        children: [{
-            name: 'text',
-            content: "fuga",
-        }]
-    }, {
-        name: 'text',
-        content: " poyo",
-    }]
-}
-```
-
-### 6. Italic 
-String surrounded with \_ symbols
-
-#### Pattern
-``` /(?<=^|\W)_(.+?)_(?=\W|$)/ ```
-
-#### Example
-``` hoge _fuga_ poyo ```
-
-```javascript
-{
-  name: 'root',
-  children: [{
-        name: 'text',
-        content: "hoge ",
-    }, {
-        name: 'italic',
-        children: [{
-            name: 'text',
-            content: "fuga",
-        }]
-    }, {
-        name: 'text',
-        content: " poyo",
-    }]
-}
-```
-
-### 7. Strike 
-String surrounded with \~ symbols
-
-#### Pattern
-``` /(?<=^|\W)\~(.+?)\~(?=\W|$)/ ```
-
-#### Example
-``` hoge ~fuga~ poyo ```
-
-```javascript
-{
-  name: 'root',
-  children: [{
-        name: 'text',
-        content: "hoge ",
-    }, {
-        name: 'strike',
-        children: [{
-            name: 'text',
-            content: "fuga",
-        }]
-    }, {
-        name: 'text',
-        content: " poyo",
-    }]
-}
-```
-
-### 8. Quote 
+### 3. Quote 
 String started with \> symbol
 
 #### Pattern
@@ -343,6 +209,140 @@ String started with \> symbol
             name: 'text',
             content: "ABC",
         }]
+    }]
+}
+```
+
+### 4. Link 
+String surrounded with \< \> symbols  with optional \| separator for presentation part
+
+#### Pattern
+``` /<([^\u001D\u001E]+?)(?:\|(.+?))?>/ ```
+
+#### Example
+``` 123 <!456> 789 ```
+
+```javascript
+{
+  name: 'root',
+  children: [{
+    name: 'text',
+    content: "123 ",
+  }, {
+    name: 'link',
+    content: "!456",
+  }, {
+    name: 'text',
+    content: " 789",
+  }]
+}
+```
+
+### 5. Emoji 
+String surrounded with \: symbols
+
+#### Pattern
+``` /:([a-z0-9-+_]+):/ ```
+
+#### Example
+``` 123:smile-456:789 ```
+
+```javascript
+{
+  name: 'root',
+  children: [{
+        name: 'text',
+        content: "123",
+    }, {
+        name: 'emoji',
+        content: "smile-456",
+    }, {
+        name: 'text',
+        content: "789",
+    }]
+}
+```
+
+### 6. Bold 
+String surrounded with \* symbols
+
+#### Pattern
+``` /(?<=^|\W)\*(.+?)\*(?=\W|$)/ ```
+
+#### Example
+``` hoge *fuga* poyo ```
+
+```javascript
+{
+  name: 'root',
+  children: [{
+        name: 'text',
+        content: "hoge ",
+    }, {
+        name: 'bold',
+        children: [{
+            name: 'text',
+            content: "fuga",
+        }]
+    }, {
+        name: 'text',
+        content: " poyo",
+    }]
+}
+```
+
+### 7. Italic 
+String surrounded with \_ symbols
+
+#### Pattern
+``` /(?<=^|\W)_(.+?)_(?=\W|$)/ ```
+
+#### Example
+``` hoge _fuga_ poyo ```
+
+```javascript
+{
+  name: 'root',
+  children: [{
+        name: 'text',
+        content: "hoge ",
+    }, {
+        name: 'italic',
+        children: [{
+            name: 'text',
+            content: "fuga",
+        }]
+    }, {
+        name: 'text',
+        content: " poyo",
+    }]
+}
+```
+
+### 8. Strike 
+String surrounded with \~ symbols
+
+#### Pattern
+``` /(?<=^|\W)\~(.+?)\~(?=\W|$)/ ```
+
+#### Example
+``` hoge ~fuga~ poyo ```
+
+```javascript
+{
+  name: 'root',
+  children: [{
+        name: 'text',
+        content: "hoge ",
+    }, {
+        name: 'strike',
+        children: [{
+            name: 'text',
+            content: "fuga",
+        }]
+    }, {
+        name: 'text',
+        content: " poyo",
     }]
 }
 ```
