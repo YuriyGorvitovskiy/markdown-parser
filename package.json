@@ -1,7 +1,7 @@
 {
     "name": "markdown-parser",
     "release": "Markdown Parser library",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "Markdown Parser library, with Slack support",
     "main": "src/index.ts",
     "keywords": [
@@ -31,7 +31,7 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@types/jest": "26.0.15",
+        "@types/jest": "26.0.16",
         "@types/node": "14.14.10",
         "eslint": "7.14.0",
         "jest": "26.6.3",

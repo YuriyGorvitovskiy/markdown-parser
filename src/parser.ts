@@ -1,3 +1,4 @@
+import { release } from "os"
 import { Mark, MarkRule } from "./mark"
 import { State } from "./state"
 
@@ -28,7 +29,7 @@ const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): M
     const state = State.of(root)
     const combo = mergeMarkText(root.children)
 
-    const regex = new RegExp(rule.pattern, 'g')
+    const regex = new RegExp(rule.pattern, 'g' + rule.pattern.flags)
     let prevIndex = 0
     for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
         processText(state, rule, combo.substring(prevIndex, match.index))
