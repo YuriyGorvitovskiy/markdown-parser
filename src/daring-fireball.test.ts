@@ -64,7 +64,8 @@ test("Daring Fireball html-block parser.", () => {
 test("Daring Fireball paragraph and line-break parser.", () => {
     // Execute
     const result1 = parse("This is\nparagraph\n\n", DARING_FIREBALL_RULES)
-    const result2 = parse("This is  \nparagraph\n \t\nAnd another paragraph\n\t\n", DARING_FIREBALL_RULES)
+    const result2 = parse("This is line  \nbreak", DARING_FIREBALL_RULES)
+    const result3 = parse("This is   \nparagraph\n \t\n\nAnd another paragraph\n\t\n", DARING_FIREBALL_RULES)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -76,6 +77,16 @@ test("Daring Fireball paragraph and line-break parser.", () => {
     }])
 
     expect(result2.children).toMatchObject([{
+        name: 'text',
+        content: 'This is line'
+    }, {
+        name: 'line-break',
+    }, {
+        name: 'text',
+        content: 'break'
+    }])
+
+    expect(result3.children).toMatchObject([{
         name: 'paragraph',
         children: [{
             name: 'text',

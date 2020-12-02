@@ -39,11 +39,19 @@ const HTML_SINGLETON_TAG: MarkRule<DaringFireballMark> = {
 // [\s\S] is to match any character including newline
 const PARAGRAPH: MarkRule<DaringFireballMark> = {
     pattern: /^(\S[\s\S]+?)\n\s*\n/m,
-    process: textFromGroup1('paragraph'),
+    process: (match) => ({
+        mark: {
+            name: 'paragraph',
+            children: [],
+            recursive: true,
+            unbreakable: true,
+        } as HtmlTagMark,
+        text: match[1],
+    })
 }
 
 const LINE_BREAK: MarkRule<DaringFireballMark> = {
-    pattern: /\s\s\n/m,
+    pattern: /\s\s+\n/m,
     process: () => ({ mark: { name: 'line-break' }, text: "" }),
 }
 
