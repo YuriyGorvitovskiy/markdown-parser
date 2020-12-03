@@ -43,7 +43,7 @@ export const STRIKE: MarkRule<SlackMark> = {
 
 const QUOTE_EXTRACT = /^>\s?/m
 export const QUOTE: MarkRule<SlackMark> = {
-    pattern: /(?<=(?:^|\n))((?:\>[^\n]+?(?:\n|$))+)/m,
+    pattern: /(?<=(?:^|\n))((?:(?:\>|\&gt\;)[^\n]+?(?:\n|$))+)/m,
     process: (m) => ({
         mark: { name: 'quote', children: [] },
         text: m[0].split(QUOTE_EXTRACT).join("")
