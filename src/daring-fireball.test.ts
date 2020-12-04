@@ -150,7 +150,7 @@ test("Daring Fireball html escaped symbols and entities.", () => {
 
 test("Daring Fireball header with underline.", () => {
     // Execute
-    const result1 = parse("Header 1\n====\n\nHeader 2\n-----", DARING_FIREBALL_RULES)
+    const result1 = parse("Header 1\n====\n\nParagraph\n\nHeader 2\n-----", DARING_FIREBALL_RULES)
     const result2 = parse("# This is an H1\n\n## This is an H2\n\n###### This is an H6", DARING_FIREBALL_RULES)
     const result3 = parse("# This is an H1 #\n\n## This is an H2 ##\n\n### This is an H3 ######", DARING_FIREBALL_RULES)
 
@@ -161,6 +161,12 @@ test("Daring Fireball header with underline.", () => {
         children: [{
             name: 'text',
             content: 'Header 1'
+        }]
+    }, {
+        name: 'paragraph',
+        children: [{
+            name: 'text',
+            content: 'Paragraph'
         }]
     }, {
         name: 'header',

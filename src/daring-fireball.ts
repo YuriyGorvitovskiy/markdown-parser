@@ -40,9 +40,9 @@ const HTML_SINGLETON_TAG: MarkRule<DaringFireballMark> = {
     }),
 }
 
-// [\s\S] is to match any character including newline
+// We should ignore all other blocks so we start with first non-boundary block 
 const PARAGRAPH: MarkRule<DaringFireballMark> = {
-    pattern: /^(\S[\s\S]+?)\n\s*\n/m,
+    pattern: /([^\u001D\u001E]+?)\n\s*\n/m,
     process: (match) => ({
         mark: {
             name: 'paragraph',
