@@ -355,3 +355,47 @@ test("Slack parser", () => {
         }]
     },])
 })
+
+test("3 levels of intersection", () => {
+    // Setup
+    const markdown = "_italic *bold ~strike_ no-italic* no-bold~ no-strike"
+
+    // Execute
+    const result = parse(markdown, SLACK_RULES)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: 'italic',
+        children: [{
+            name: 'text',
+            content: "italic ",
+        }, {
+            name: 'bold',
+            children: [{
+                name: 'text',
+                content: "bold ",
+            }, {
+                name: 'strike',
+                children: [{
+                    name: 'text',
+                    content: "strike",
+                }]
+            }]
+        }]
+    }, {
+        name: 'strike',
+        children: [{
+            name: 'bold',
+            children: [{
+                name: 'text',
+                content: " no-italic",
+            }]
+        }, {
+            name: 'text',
+            content: " no-bold",
+        }]
+    }, {
+        name: 'text',
+        content: " no-strike",
+    }])
+})

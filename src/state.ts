@@ -140,7 +140,7 @@ export class State<M extends string> {
             // reopen active mark
             const repeat = { ...this.active.mark, children: [] }
             this.parents.push(this.current)
-            this.active = this.current = { mark: repeat, unprocessed: this.active.unprocessed, secondary: true }
+            this.active = this.current = { mark: repeat, unprocessed: this.current.unprocessed, secondary: true }
         }
 
         return this
