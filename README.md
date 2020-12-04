@@ -132,7 +132,7 @@ https://api.slack.com/reference/surfaces/formatting
 
 ## Daring Fireball
 
-https://daringfireball.net/projects/markdown/syntax#autolink
+https://daringfireball.net/projects/markdown/syntax
 
 ## GitHub 
 

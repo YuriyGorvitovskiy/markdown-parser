@@ -1,10 +1,14 @@
 import HTML_ENTITY_LOOKUP from "./html-entities"
 import { Mark, MarkRule, textFromGroup1 } from "./mark"
 
-export type DaringFireballMark = 'html-tag' | 'paragraph' | 'line-break' | 'escaped'
+export type DaringFireballMark = 'html-tag' | 'paragraph' | 'line-break' | 'escaped' | 'header'
 
 export interface HtmlTagMark extends Mark<DaringFireballMark> {
     tag: string
+}
+
+export interface HeaderMark extends Mark<DaringFireballMark> {
+    content: '1' | '2' | '3' | '4' | '5' | '6'
 }
 
 const HTML_TAG: MarkRule<DaringFireballMark> = {
@@ -50,6 +54,36 @@ const PARAGRAPH: MarkRule<DaringFireballMark> = {
     })
 }
 
+// We should capture \n at the end to avoid paragraph around header
+const HEADER_UNDERLINE: MarkRule<DaringFireballMark> = {
+    pattern: /^(\S.+)\n(=+|-+)\s*(?:\n|$)/m,
+    process: (match) => ({
+        mark: {
+            name: 'header',
+            content: match[2].startsWith("=") ? "1" : "2",
+            children: [],
+            recursive: true,
+            unbreakable: true,
+        } as HeaderMark,
+        text: match[1],
+    })
+}
+
+// We should capture \n at the end to avoid paragraph around header
+const HEADER_SHARP: MarkRule<DaringFireballMark> = {
+    pattern: /^(#{1,6})\s+(\S.+?)(?:\s+#+)?\s*(?:\n|$)/m,
+    process: (match) => ({
+        mark: {
+            name: 'header',
+            content: "" + match[1].length,
+            children: [],
+            recursive: true,
+            unbreakable: true,
+        } as HeaderMark,
+        text: match[2],
+    })
+}
+
 const LINE_BREAK: MarkRule<DaringFireballMark> = {
     pattern: /\s\s+\n/m,
     process: () => ({ mark: { name: 'line-break' }, text: "" }),
@@ -72,6 +106,8 @@ const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
 export const DARING_FIREBALL_RULES = [
     HTML_TAG,
     HTML_SINGLETON_TAG,
+    HEADER_UNDERLINE,
+    HEADER_SHARP,
     PARAGRAPH,
     LINE_BREAK,
     HTML_ESCAPE,

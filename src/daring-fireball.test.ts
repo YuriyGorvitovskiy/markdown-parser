@@ -147,3 +147,74 @@ test("Daring Fireball html escaped symbols and entities.", () => {
     }])
 
 })
+
+test("Daring Fireball header with underline.", () => {
+    // Execute
+    const result1 = parse("Header 1\n====\n\nHeader 2\n-----", DARING_FIREBALL_RULES)
+    const result2 = parse("# This is an H1\n\n## This is an H2\n\n###### This is an H6", DARING_FIREBALL_RULES)
+    const result3 = parse("# This is an H1 #\n\n## This is an H2 ##\n\n### This is an H3 ######", DARING_FIREBALL_RULES)
+
+    // Verify
+    expect(result1.children).toMatchObject([{
+        name: 'header',
+        content: '1',
+        children: [{
+            name: 'text',
+            content: 'Header 1'
+        }]
+    }, {
+        name: 'header',
+        content: '2',
+        children: [{
+            name: 'text',
+            content: 'Header 2'
+        }]
+    }])
+
+    expect(result2.children).toMatchObject([{
+        name: 'header',
+        content: '1',
+        children: [{
+            name: 'text',
+            content: 'This is an H1'
+        }]
+    }, {
+        name: 'header',
+        content: '2',
+        children: [{
+            name: 'text',
+            content: 'This is an H2'
+        }]
+    }, {
+        name: 'header',
+        content: '6',
+        children: [{
+            name: 'text',
+            content: 'This is an H6'
+        }]
+    }])
+
+    expect(result3.children).toMatchObject([{
+        name: 'header',
+        content: '1',
+        children: [{
+            name: 'text',
+            content: 'This is an H1'
+        }]
+    }, {
+        name: 'header',
+        content: '2',
+        children: [{
+            name: 'text',
+            content: 'This is an H2'
+        }]
+    }, {
+        name: 'header',
+        content: '3',
+        children: [{
+            name: 'text',
+            content: 'This is an H3'
+        }]
+    }])
+})
+
