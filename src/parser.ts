@@ -20,7 +20,7 @@ const mergeMarkText = (marks: Mark<any>[]): string =>
 const processText = <M extends string>(state: State<M>, rule: MarkRule<M>, text: string): State<M> => {
     return text.split(SPLIT).reduce((s, t, i) =>
         i % 2
-            ? t.startsWith(BEGIN) ? s.addProcessedMarks(t.length) : s.closeProcessedMarks(t.length, m => m.recursive ? applyMarkPattern(m, rule) : m)
+            ? t.startsWith(BEGIN) ? s.addProcessedMarks(t.length) : s.closeProcessedMarks(t.length, m => m.unbreakable ? applyMarkPattern(m, rule) : m)
             : s.addText(t),
         state)
 }
@@ -33,10 +33,10 @@ const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): M
     let prevIndex = 0
     for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
         processText(state, rule, combo.substring(prevIndex, match.index))
-        const { mark, text } = rule.process(match)
+        const { mark, text, recursive } = rule.process(match)
         mark && state.addActiveMark(mark)
         text && processText(state, rule, text)
-        mark && state.closeActiveMark(m => m.recursive ? applyMarkPattern(m, rule) : m)
+        mark && state.closeActiveMark(m => recursive ? applyMarkPattern(m, rule) : m)
     }
     processText(state, rule, combo.substring(prevIndex))
     return state.getCurrentMark()
