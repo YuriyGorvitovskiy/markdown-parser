@@ -63,3 +63,41 @@ test("Code with HTML inside", () => {
 </div>`,
     }])
 })
+
+test("Code between qoutes", () => {
+    // Setup
+    const source = `> Quoted line
+
+    Code block
+> Another quoted line
+`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL_RULES)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: 'quote',
+        children: [{
+            name: 'paragraph',
+            children: [{
+                name: 'text',
+                content: `Quoted line`
+            }]
+        }]
+    }, {
+        name: 'code',
+        content: `Code block
+`,
+    }, {
+        name: 'quote',
+        children: [{
+            name: 'paragraph',
+            children: [{
+                name: 'text',
+                content: `Another quoted line`
+            }]
+        }]
+
+    }])
+})

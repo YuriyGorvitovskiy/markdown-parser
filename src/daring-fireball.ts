@@ -54,20 +54,20 @@ const HTML_SINGLETON_TAG: MarkRule<DaringFireballMark> = {
 }
 
 const QUOTE: MarkRule<DaringFireballMark> = {
-    pattern: /^(>[ \t][^\u001D\u001E]*?(?:\n[ \t]*)+(?:\n|$))/m,
+    pattern: /^(> ?[^\u001D\u001E]*?(?:\n[ \t]*)+(?:\n|$))/m,
     process: (match) => ({
         mark: {
             name: 'quote',
             children: [],
             unbreakable: true,
         },
-        text: match[1].replace(/^\>[ \t]?/gm, ""),
+        text: match[1].replace(/^\> ?/gm, ""),
         recursive: true
     })
 }
 
 const CODE: MarkRule<DaringFireballMark> = {
-    pattern: /((?:^(?: {4,}|\t)[^\n\u001D\u001E]*[^ \t\n\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?: {4,}|\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
+    pattern: /(?<=^|\u001E)((?:(?:    |\t)[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?:    |\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
     process: (match) => ({
         mark: {
             name: 'code',
