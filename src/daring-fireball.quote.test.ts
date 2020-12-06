@@ -149,11 +149,9 @@ test("Block Quote of Header List and Code", () => {
                 content: `Here's some example code:`
             }]
         }, {
-            name: 'paragraph',
-            children: [{
-                name: 'text',
-                content: `    return shell_exec("echo $input | $markdown_script");`
-            }]
+            name: 'code',
+            content: `return shell_exec("echo $input | $markdown_script");
+`
         }]
     }])
 })

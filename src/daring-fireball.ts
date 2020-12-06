@@ -1,7 +1,7 @@
 import HTML_ENTITY_LOOKUP from "./html-entities"
 import { Mark, MarkRule, textFromGroup1 } from "./mark"
 
-export type DaringFireballMark = 'html-block' | 'html-tag' | 'paragraph' | 'quote' | 'line-break' | 'escaped' | 'header'
+export type DaringFireballMark = 'code' | 'escaped' | 'header' | 'html-block' | 'html-tag' | 'line-break' | 'quote' | 'paragraph'
 
 export interface HtmlTagMark extends Mark<DaringFireballMark> {
     tag: string
@@ -63,6 +63,17 @@ const QUOTE: MarkRule<DaringFireballMark> = {
         },
         text: match[1].replace(/^\>[ \t]?/gm, ""),
         recursive: true
+    })
+}
+
+const CODE: MarkRule<DaringFireballMark> = {
+    pattern: /((?:^(?: {4,}|\t)[^\n\u001D\u001E]*[^ \t\n\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?: {4,}|\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
+    process: (match) => ({
+        mark: {
+            name: 'code',
+            content: match[1].replace(/^(?:    |\t)/gm, ""),
+        },
+        text: ""
     })
 }
 
@@ -130,6 +141,7 @@ const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
 export const DARING_FIREBALL_RULES = [
     QUOTE,
     HTML_BLOCK,
+    CODE,
     HEADER_UNDERLINE,
     HEADER_SHARP,
     PARAGRAPH,
