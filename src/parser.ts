@@ -20,7 +20,7 @@ const mergeMarkText = (marks: Mark<any>[]): string =>
 const processText = <M extends string>(state: State<M>, rule: MarkRule<M>, text: string): State<M> => {
     return text.split(SPLIT).reduce((s, t, i) =>
         i % 2
-            ? t.startsWith(BEGIN) ? s.addProcessedMarks(t.length) : s.closeProcessedMarks(t.length, m => m.unbreakable ? applyMarkPattern(m, rule) : m)
+            ? t.startsWith(BEGIN) ? s.addProcessedMarks(t.length) : s.closeProcessedMarks(t.length)
             : s.addText(t),
         state)
 }
@@ -33,16 +33,20 @@ const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): M
     let prevIndex = 0
     for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
         processText(state, rule, combo.substring(prevIndex, match.index))
-        const { mark, text, recursive } = rule.process(match)
+        const { mark, text } = rule.process(match)
         mark && state.addActiveMark(mark)
         text && processText(state, rule, text)
-        mark && state.closeActiveMark(m => recursive ? applyMarkPattern(m, rule) : m)
+        mark && state.closeActiveMark()
     }
     processText(state, rule, combo.substring(prevIndex))
     return state.getCurrentMark()
 }
 
 export const parse = <M extends string>(text: string, rules: MarkRule<M>[]): Mark<M> => {
+    if (!text) {
+        return { name: 'root', children: [] }
+    }
+
     const cleanText = text.replace(BEGIN, "").replace(END, "")
     const root: Mark<M> = { name: 'root', children: [{ name: 'text', content: cleanText }] }
     return rules.reduce((m, r) => applyMarkPattern(m, r), root)

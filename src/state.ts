@@ -67,14 +67,14 @@ export class State<M extends string> {
         return this
     }
 
-    closeActiveMark(postProcess: (mark: Mark<M>) => Mark<M>): State<M> {
+    closeActiveMark(): State<M> {
         const backup: Level<M>[] = []
         // close all marks below active, and keep them in stack
         while (this.current !== this.active) {
             backup.push(this.current)
             const ended = this.current;
             this.current = this.parents.pop()
-            const mark = postProcess(ended.mark)
+            const mark = ended.mark
             if (!ended.secondary || mark.children?.length) {
                 // add only primary or not empty mark secondary
                 this.current.mark.children.push(mark)
@@ -84,7 +84,7 @@ export class State<M extends string> {
         const ended = this.current;
         this.current = this.parents.pop()
         this.active = null
-        const mark = postProcess(ended.mark)
+        const mark = ended.mark
         if (!ended.secondary || mark.children?.length) {
             // add only primary or not empty mark secondary
             this.current.mark.children.push(mark)
@@ -112,7 +112,7 @@ export class State<M extends string> {
         return this
     }
 
-    closeProcessedMarks(levels: number, postProcess: (mark: Mark<M>) => Mark<M>): State<M> {
+    closeProcessedMarks(levels: number): State<M> {
         let activeClosed = false;
         // close all marks below recursively
         while (levels-- > 0) {
@@ -120,7 +120,7 @@ export class State<M extends string> {
                 // if there is an active mark, close it also, but don't count
                 const ended = this.current;
                 this.current = this.parents.pop()
-                const mark = postProcess(ended.mark)
+                const mark = ended.mark
                 if (!ended.secondary || mark.children?.length) {
                     // add only primary or not empty mark secondary
                     this.current.mark.children.push(mark)
@@ -129,7 +129,7 @@ export class State<M extends string> {
             }
             const ended = this.current;
             this.current = this.parents.pop()
-            const mark = postProcess(ended.mark)
+            const mark = ended.mark
             if (!ended.secondary || mark.children?.length) {
                 // add only primary or not empty mark secondary
                 this.current.mark.children.push(mark)

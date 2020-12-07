@@ -8,6 +8,7 @@ test("Block Quote with all lines marked", () => {
 > 
 > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse
 > id sem consectetuer libero luctus adipiscing.
+>
 `
     // Execute
     const result = parse(source, DARING_FIREBALL_RULES)
@@ -42,6 +43,7 @@ Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.
 
 > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse
 id sem consectetuer libero luctus adipiscing.
+
 `
     // Execute
     const result = parse(source, DARING_FIREBALL_RULES)
@@ -57,10 +59,7 @@ id sem consectetuer libero luctus adipiscing.
 consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.
 Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.`
             }]
-        }]
-    }, {
-        name: 'quote',
-        children: [{
+        }, {
             name: 'paragraph',
             children: [{
                 name: 'text',
@@ -78,6 +77,7 @@ test("Block Quote with inner quote", () => {
 > > This is nested blockquote.
 >
 > Back to the first level.
+
 `
     // Execute
     const result = parse(source, DARING_FIREBALL_RULES)
@@ -136,11 +136,22 @@ test("Block Quote of Header List and Code", () => {
                 content: `This is a header.`
             }]
         }, {
-            name: 'paragraph',
+            name: 'ordered-list',
             children: [{
-                name: 'text',
-                content: `1.   This is the first list item.
-2.   This is the second list item.`
+                name: 'list-item',
+                children: [{
+                    name: 'text',
+                    content: `This is the first list item.`
+                }]
+            }, {
+                name: 'list-item',
+                children: [{
+                    name: 'paragraph',
+                    children: [{
+                        name: 'text',
+                        content: `This is the second list item.`
+                    }]
+                }]
             }]
         }, {
             name: 'paragraph',

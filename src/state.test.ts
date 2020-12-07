@@ -19,7 +19,7 @@ test("State manipulation BOLD Pass 1 ", () => {
         .addText("12 _34 ")
         .addActiveMark({ name: 'bold', children: [] })
         .addText("56_ _78")
-        .closeActiveMark(m => m)
+        .closeActiveMark()
         .addText(" 90_ AB")
 
     // Verify 
@@ -60,13 +60,13 @@ test("State manipulation BOLD + ITALIC Pass 2", () => {
         .addText("34 ")
         .addProcessedMarks(1)
         .addText("56")
-        .closeActiveMark(m => m)
+        .closeActiveMark()
         .addText(" ")
         .addActiveMark({ name: 'italic', children: [] })
         .addText("78")
-        .closeProcessedMarks(1, m => m)
+        .closeProcessedMarks(1)
         .addText(" 90")
-        .closeActiveMark(m => m)
+        .closeActiveMark()
         .addText(" AB")
 
 

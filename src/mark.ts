@@ -5,7 +5,7 @@ export interface Mark<M extends string> {
     readonly unbreakable?: boolean
 }
 
-type PatternHandler<M extends string> = (match: string[]) => { mark: Mark<M>, text: string, recursive?: boolean };
+type PatternHandler<M extends string> = (match: string[]) => { mark: Mark<M>, text: string };
 
 export interface MarkRule<M extends string> {
     readonly pattern: RegExp

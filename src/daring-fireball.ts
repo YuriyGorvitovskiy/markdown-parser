@@ -1,7 +1,8 @@
 import HTML_ENTITY_LOOKUP from "./html-entities"
-import { Mark, MarkRule, textFromGroup1 } from "./mark"
+import { Mark, MarkRule } from "./mark"
+import { parse } from "./parser"
 
-export type DaringFireballMark = 'code' | 'escaped' | 'header' | 'html-block' | 'html-tag' | 'line-break' | 'quote' | 'paragraph'
+export type DaringFireballMark = 'bullet-list' | 'code' | 'escaped' | 'header' | 'html-block' | 'html-tag' | 'line-break' | 'list-item' | 'ordered-list' | 'quote' | 'paragraph'
 
 export interface HtmlTagMark extends Mark<DaringFireballMark> {
     tag: string
@@ -12,14 +13,15 @@ export interface HeaderMark extends Mark<DaringFireballMark> {
 }
 
 const HTML_BLOCK: MarkRule<DaringFireballMark> = {
-    pattern: /^(\<(address|aside|blockquote|canvas|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hr|li|main|nav|noscript|ol|p|pre|section|table|tfoot|ul|video)(?:\s+([^\u001D\u001E]+?))?(?:\s?\/\>|\>(?:[^\u001D\u001E]*?)^\<\/\2\>))(?:\n[ \t]*)+(?:\n|$)/m,
+    pattern: /^\<(address|aside|blockquote|canvas|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hr|li|main|nav|noscript|ol|p|pre|section|table|tfoot|ul|video)(?:\s+([^\u001D\u001E]+?)\s*)?(?:\/\>|\>([^\u001D\u001E]*?)^\<\/\1\>)(?:\n[ \t]*)+(?:\n|$)/m,
     process: (match) => ({
         mark: {
-            name: 'html-block',
-            content: match[1],
-            children: [],
+            name: 'html-tag',
+            tag: match[1],
+            content: match[2],
+            children: parse(match[3], [HTML_TAG, HTML_SINGLETON_TAG]).children,
             unbreakable: true,
-        },
+        } as HtmlTagMark,
         text: "",
     }),
 }
@@ -31,11 +33,10 @@ const HTML_TAG: MarkRule<DaringFireballMark> = {
             name: 'html-tag',
             tag: match[1],
             content: match[2],
-            children: [],
+            children: parse(match[3], [HTML_TAG, HTML_SINGLETON_TAG]).children,
             unbreakable: true,
         } as HtmlTagMark,
-        text: match[3],
-        recursive: true,
+        text: "",
     }),
 }
 
@@ -47,22 +48,66 @@ const HTML_SINGLETON_TAG: MarkRule<DaringFireballMark> = {
             name: 'html-tag',
             tag: match[1],
             content: match[2],
-            children: [],
+            children: parse(match[3], [HTML_TAG, HTML_SINGLETON_TAG]).children,
         } as HtmlTagMark,
-        text: match[3],
+        text: "",
     }),
 }
 
 const QUOTE: MarkRule<DaringFireballMark> = {
-    pattern: /^(> ?[^\u001D\u001E]*?(?:\n[ \t]*)+(?:\n|$))/m,
+    //pattern: /^(> ?[^\u001D\u001E]*?(?:\n[ \t]*)+(?:\n|$))/m,
+    pattern: /(?<=^|\u001E)((?:>(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)+)/m,
     process: (match) => ({
         mark: {
             name: 'quote',
-            children: [],
+            children: parse(match[1].replace(/^\> ?/gm, ""), DARING_FIREBALL_RULES).children,
             unbreakable: true,
         },
-        text: match[1].replace(/^\> ?/gm, ""),
-        recursive: true
+        text: ""
+    })
+}
+
+const BULLET_LIST: MarkRule<DaringFireballMark> = {
+    // start with (?<=^|\u001E)(?: {0,3}|\t)[*+-][ \t]
+    // continue: (?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t)
+    // paragraph line: (?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*\n)*
+    // paragraph ending: (?:[ \t]*\n)*
+    pattern: /(?<=^|\u001E)((?: {0,3}|\t)[*+-][ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
+    process: (match) => ({
+        mark: {
+            name: 'bullet-list',
+            children: match[1].split(/^(?: {0,3}|\t)[*+-](?: {0,3}|\t)/gm)
+                .slice(1)
+                .map(t => ({
+                    name: 'list-item',
+                    children: parse(t.replace(/^(?:    |\t)/gm, ""), DARING_FIREBALL_RULES).children,
+                    unbreakable: true,
+                })),
+            unbreakable: true,
+        },
+        text: "",
+    })
+}
+
+const ORDERED_LIST: MarkRule<DaringFireballMark> = {
+    // start with (?<=^|\u001E)(?: {0,3}|\t)[*+-][ \t]
+    // continue: (?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t)
+    // paragraph line: (?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*\n)*
+    // paragraph ending: (?:[ \t]*\n)*
+    pattern: /(?<=^|\u001E)((?: {0,3}|\t)\d+\.[ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)\d+\.[ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
+    process: (match) => ({
+        mark: {
+            name: 'ordered-list',
+            children: match[1].split(/^(?: {0,3}|\t)\d+\.(?: {0,3}|\t)/gm)
+                .slice(1)
+                .map(t => ({
+                    name: 'list-item',
+                    children: parse(t.replace(/^(?:    |\t)/gm, ""), DARING_FIREBALL_RULES).children,
+                    unbreakable: true,
+                })),
+            unbreakable: true,
+        },
+        text: "",
     })
 }
 
@@ -73,20 +118,20 @@ const CODE: MarkRule<DaringFireballMark> = {
             name: 'code',
             content: match[1].replace(/^(?:    |\t)/gm, ""),
         },
-        text: ""
+        text: "",
     })
 }
 
 // We should ignore all other blocks so we start with first non-boundary block 
 const PARAGRAPH: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+(?:\n|$)/m,
+    pattern: /(?<=^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+\n/m,
     process: (match) => ({
         mark: {
             name: 'paragraph',
-            children: [],
+            children: parse(match[1], INLINE_RULES).children,
             unbreakable: true,
         } as HtmlTagMark,
-        text: match[1],
+        text: "",
     })
 }
 
@@ -97,10 +142,10 @@ const HEADER_UNDERLINE: MarkRule<DaringFireballMark> = {
         mark: {
             name: 'header',
             content: match[2].startsWith("=") ? "1" : "2",
-            children: [],
+            children: parse(match[1], INLINE_RULES).children,
             unbreakable: true,
         } as HeaderMark,
-        text: match[1],
+        text: "",
     })
 }
 
@@ -111,17 +156,21 @@ const HEADER_SHARP: MarkRule<DaringFireballMark> = {
         mark: {
             name: 'header',
             content: "" + match[1].length,
-            children: [],
-            recursive: true,
+            children: parse(match[2], INLINE_RULES).children,
             unbreakable: true,
         } as HeaderMark,
-        text: match[2],
+        text: "",
     })
 }
 
 const LINE_BREAK: MarkRule<DaringFireballMark> = {
     pattern: /\s\s+\n/m,
     process: () => ({ mark: { name: 'line-break' }, text: "" }),
+}
+
+const TRIM_TEXT: MarkRule<DaringFireballMark> = {
+    pattern: /\n(?=\u001D|$)/m,
+    process: () => ({ mark: null, text: "" }),
 }
 
 const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
@@ -137,16 +186,22 @@ const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
         text: ""
     }),
 }
+export const INLINE_RULES = [
+    HTML_TAG,
+    HTML_SINGLETON_TAG,
+    LINE_BREAK,
+    TRIM_TEXT,
+    HTML_ESCAPE,
+]
 
 export const DARING_FIREBALL_RULES = [
     QUOTE,
     HTML_BLOCK,
+    BULLET_LIST,
+    ORDERED_LIST,
     CODE,
     HEADER_UNDERLINE,
     HEADER_SHARP,
     PARAGRAPH,
-    HTML_TAG,
-    HTML_SINGLETON_TAG,
-    LINE_BREAK,
-    HTML_ESCAPE,
+    ...INLINE_RULES,
 ]

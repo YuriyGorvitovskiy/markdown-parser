@@ -24,9 +24,32 @@ This is another regular paragraph.
             content: 'This is a regular paragraph.'
         }]
     }, {
-        name: 'html-block',
-        content: '<table>\n    <tr>\n        <td>Foo</td>\n    </tr>\n</table>',
-        children: []
+        name: 'html-tag',
+        tag: 'table',
+        children: [{
+            name: 'text',
+            content: '\n    ',
+        }, {
+            name: 'html-tag',
+            tag: 'tr',
+            children: [{
+                name: 'text',
+                content: '\n        ',
+            }, {
+                name: 'html-tag',
+                tag: 'td',
+                children: [{
+                    name: 'text',
+                    content: 'Foo',
+                }]
+            }, {
+                name: 'text',
+                content: '\n    ',
+            }]
+        }, {
+            name: 'text',
+            content: '\n',
+        },]
     }, {
         name: 'paragraph',
         children: [{
