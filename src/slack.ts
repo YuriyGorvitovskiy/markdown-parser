@@ -1,5 +1,5 @@
 import { match } from "assert"
-import { MarkRule, contentFromGroup, textFromGroup } from "./mark"
+import { MarkRule, contentFromGroup, extractGroupContent, textFromGroup } from "./mark"
 
 export type SlackMark = 'code-block' | 'code-inline' | 'link' | 'emoji' | 'quote' | 'line-break' | 'bold' | 'italic' | 'strike'
 
@@ -44,10 +44,10 @@ export const STRIKE: MarkRule<SlackMark> = {
 
 const QUOTE_EXTRACT = /^>\s?/m
 export const QUOTE: MarkRule<SlackMark> = {
-    pattern: /(?<=(?:^|\n))((?:(?:\>|\&gt\;)[^\n]+?(?:\n|$))+)/m,
-    process: (m) => ({
+    pattern: /(^|\n)((?:(?:\>|\&gt\;)[^\n]+?(?:\n|$))+)/m,
+    process: (m, r) => ({
         mark: { name: 'quote', children: [] },
-        text: m[0].split(QUOTE_EXTRACT).join("")
+        text: extractGroupContent(m, r, true, false).split(QUOTE_EXTRACT).join("")
     }),
 }
 
