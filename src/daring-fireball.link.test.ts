@@ -5,7 +5,6 @@ test("Link with title and without title.", () => {
     const source = `This is [an example](http://example.com/ "Title") inline link.
 
 [This link](http://example.net/) has no title attribute.
-
 `
 
     // Execute

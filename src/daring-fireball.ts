@@ -193,11 +193,6 @@ const LINK_INLINE: MarkRule<DaringFireballMark> = {
     }),
 }
 
-const TRIM_TEXT: MarkRule<DaringFireballMark> = {
-    pattern: /(?:(?<=^|\u001E)\n+|\n+(?=\u001D|$))/m,
-    process: () => ({ mark: null, text: "" }),
-}
-
 const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
     pattern: /&(?:(?:#)(\d+)|(?:#[xX])([\da-fA-F]+)|(\w+));/,
     process: (match) => ({
@@ -226,7 +221,6 @@ export const BLOCK_RULES = [
 
 export const INLINE_RULES = [
     LINE_BREAK,
-    TRIM_TEXT, // should be before other inline rules 
     HTML_TAG,
     HTML_SINGLETON_TAG,
     LINK_INLINE,
