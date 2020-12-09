@@ -1,11 +1,16 @@
+import { match } from "assert"
 import HTML_ENTITY_LOOKUP from "./html-entities"
 import { Mark, MarkRule } from "./mark"
 import { parse } from "./parser"
 
-export type DaringFireballMark = 'bullet-list' | 'code' | 'escaped' | 'header' | 'html-block' | 'html-tag' | 'line-break' | 'list-item' | 'ordered-list' | 'quote' | 'paragraph'
+export type DaringFireballMark = 'bullet-list' | 'code' | 'escaped' | 'header' | 'horizontal-rule' | 'html-block' | 'html-tag' | 'line-break' | 'link' | 'list-item' | 'ordered-list' | 'quote' | 'paragraph'
 
 export interface HtmlTagMark extends Mark<DaringFireballMark> {
     tag: string
+}
+
+export interface LinkMark extends Mark<DaringFireballMark> {
+    title: string
 }
 
 export interface HeaderMark extends Mark<DaringFireballMark> {
@@ -60,12 +65,14 @@ const QUOTE: MarkRule<DaringFireballMark> = {
     process: (match) => ({
         mark: {
             name: 'quote',
-            children: parse(match[1].replace(/^\> ?/gm, ""), DARING_FIREBALL_RULES).children,
+            children: parse(match[1].replace(/^\> ?/gm, ""), RECURSIVE_RULES).children,
             unbreakable: true,
         },
         text: ""
     })
 }
+
+const trimLastLineBreak = (s: string) => s.endsWith('\n') ? s.substr(0, s.length - 1) : s
 
 const BULLET_LIST: MarkRule<DaringFireballMark> = {
     // start with (?<=^|\u001E)(?: {0,3}|\t)[*+-][ \t]
@@ -80,7 +87,7 @@ const BULLET_LIST: MarkRule<DaringFireballMark> = {
                 .slice(1)
                 .map(t => ({
                     name: 'list-item',
-                    children: parse(t.replace(/^(?:    |\t)/gm, ""), DARING_FIREBALL_RULES).children,
+                    children: parse(trimLastLineBreak(t.replace(/^(?:    |\t)/gm, "")), RECURSIVE_RULES).children,
                     unbreakable: true,
                 })),
             unbreakable: true,
@@ -102,7 +109,7 @@ const ORDERED_LIST: MarkRule<DaringFireballMark> = {
                 .slice(1)
                 .map(t => ({
                     name: 'list-item',
-                    children: parse(t.replace(/^(?:    |\t)/gm, ""), DARING_FIREBALL_RULES).children,
+                    children: parse(trimLastLineBreak(t.replace(/^(?:    |\t)/gm, "")), RECURSIVE_RULES).children,
                     unbreakable: true,
                 })),
             unbreakable: true,
@@ -122,9 +129,8 @@ const CODE: MarkRule<DaringFireballMark> = {
     })
 }
 
-// We should ignore all other blocks so we start with first non-boundary block 
 const PARAGRAPH: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+\n/m,
+    pattern: /(?<=^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+(?:\n|$)/m,
     process: (match) => ({
         mark: {
             name: 'paragraph',
@@ -134,6 +140,7 @@ const PARAGRAPH: MarkRule<DaringFireballMark> = {
         text: "",
     })
 }
+
 
 // We should capture \n at the end to avoid paragraph around header
 const HEADER_UNDERLINE: MarkRule<DaringFireballMark> = {
@@ -163,13 +170,31 @@ const HEADER_SHARP: MarkRule<DaringFireballMark> = {
     })
 }
 
+const HORIZONTAL_RULE: MarkRule<DaringFireballMark> = {
+    pattern: /^(?:(?:[ \t]*\*+){3,}|(?:[ \t]*-+){3,}|(?:[ \t]*_+){3,})(?:\n[ \t]*)*(?:\n|$)/m,
+    process: () => ({ mark: { name: 'horizontal-rule' }, text: "" }),
+}
+
 const LINE_BREAK: MarkRule<DaringFireballMark> = {
     pattern: /\s\s+\n/m,
     process: () => ({ mark: { name: 'line-break' }, text: "" }),
 }
 
+const LINK_INLINE: MarkRule<DaringFireballMark> = {
+    pattern: /\[(.*?)\]\s*\(([^\s\u001D\u001E]*?)(?:\s+\"([^"\u001D\u001E]*)\")?\s*\)/m,
+    process: (match) => ({
+        mark: {
+            name: 'link',
+            content: match[2],
+            title: match[3],
+            children: []
+        } as LinkMark,
+        text: match[1],
+    }),
+}
+
 const TRIM_TEXT: MarkRule<DaringFireballMark> = {
-    pattern: /\n(?=\u001D|$)/m,
+    pattern: /(?:(?<=^|\u001E)\n+|\n+(?=\u001D|$))/m,
     process: () => ({ mark: null, text: "" }),
 }
 
@@ -186,22 +211,34 @@ const HTML_ESCAPE: MarkRule<DaringFireballMark> = {
         text: ""
     }),
 }
-export const INLINE_RULES = [
-    HTML_TAG,
-    HTML_SINGLETON_TAG,
-    LINE_BREAK,
-    TRIM_TEXT,
-    HTML_ESCAPE,
-]
 
-export const DARING_FIREBALL_RULES = [
-    QUOTE,
-    HTML_BLOCK,
+export const BLOCK_RULES = [
+    QUOTE, // should be before first 
+    HTML_BLOCK, // should be before all, but QUOTE
+    HEADER_UNDERLINE, // should be before HORIZONTAL_RULE
+    HEADER_SHARP,
+    HORIZONTAL_RULE, // should be before BULLET_LIST
     BULLET_LIST,
     ORDERED_LIST,
     CODE,
-    HEADER_UNDERLINE,
-    HEADER_SHARP,
     PARAGRAPH,
+]
+
+export const INLINE_RULES = [
+    LINE_BREAK,
+    TRIM_TEXT, // should be before other inline rules 
+    HTML_TAG,
+    HTML_SINGLETON_TAG,
+    LINK_INLINE,
+    HTML_ESCAPE,
+]
+
+const RECURSIVE_RULES = [
+    ...BLOCK_RULES,
+    ...INLINE_RULES,
+]
+
+export const DARING_FIREBALL_RULES = [
+    ...BLOCK_RULES,
     ...INLINE_RULES,
 ]
