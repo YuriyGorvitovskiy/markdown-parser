@@ -1,19 +1,19 @@
-import { MarkRule, textFromGroup1, contentFromGroup1 } from "./mark"
+import { MarkRule, textFromGroup, contentFromGroup } from "./mark"
 import { parse } from "./parser"
 
 type SL = 'bold' | 'italic' | 'code-inline'
 
 const BOLD: MarkRule<SL> = {
-    pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
-    process: textFromGroup1('bold')
+    pattern: /(^|\W)\*(.+?)\*(\W|$)/,
+    process: textFromGroup('bold', true, true)
 }
 const ITALIC: MarkRule<SL> = {
-    pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
-    process: textFromGroup1('italic')
+    pattern: /(^|\W)_(.+?)_(\W|$)/,
+    process: textFromGroup('italic', true, true)
 }
 const CODE_INLINE: MarkRule<SL> = {
     pattern: /\`(.+?)\`/,
-    process: contentFromGroup1('code-inline')
+    process: contentFromGroup('code-inline')
 }
 /*
     "asd\n>123\n> 456\n789".split(/(?<=(?:^|\n))\>\s?(.+?(?:\n|$))/m): ["asd↵", "123↵", "", "456↵", "789"]

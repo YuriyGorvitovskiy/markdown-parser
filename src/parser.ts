@@ -32,8 +32,8 @@ const applyMarkPattern = <M extends string>(root: Mark<M>, rule: MarkRule<M>): M
     const regex = new RegExp(rule.pattern, 'g' + rule.pattern.flags)
     let prevIndex = 0
     for (let match = regex.exec(combo); match !== null; prevIndex = regex.lastIndex, match = regex.exec(combo)) {
+        const { mark, text } = rule.process(match, regex)
         processText(state, combo.substring(prevIndex, match.index))
-        const { mark, text } = rule.process(match)
         mark && state.addActiveMark(mark)
         text && processText(state, text)
         mark && state.closeActiveMark()
