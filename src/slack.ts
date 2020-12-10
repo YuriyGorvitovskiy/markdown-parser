@@ -1,17 +1,18 @@
-import { MarkRule, contentFromGroup1, textFromGroup1 } from "./mark"
+import { match } from "assert"
+import { MarkRule, contentFromGroup, extractGroupContent, textFromGroup } from "./mark"
 
 export type SlackMark = 'code-block' | 'code-inline' | 'link' | 'emoji' | 'quote' | 'line-break' | 'bold' | 'italic' | 'strike'
 
 const CODE_BLOCK: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
-    pattern: /(?<=^|\W)```\n?([^\u001D\u001E]+?)```(?=\W|$)/m,
-    process: contentFromGroup1('code-block'),
+    pattern: /(^|\W)```\n?([^\u001D\u001E]+?)```(\W|$)/m,
+    process: contentFromGroup('code-block', true, true)
 }
 
 const CODE_INLINE: MarkRule<SlackMark> = {
     // all markdown inside should be ignored 
-    pattern: /(?<=^|\W)`([^\u001D\u001E\n]+?)`(?=\W|$)/,
-    process: contentFromGroup1('code-inline'),
+    pattern: /(^|\W)`([^\u001D\u001E\n]+?)`(\W|$)/,
+    process: contentFromGroup('code-inline', true, true)
 }
 
 const LINK: MarkRule<SlackMark> = {
@@ -23,30 +24,30 @@ const LINK: MarkRule<SlackMark> = {
 const EMOJI: MarkRule<SlackMark> = {
     // all markdown inside should be ignored
     pattern: /:([a-z0-9-+_]+):/,
-    process: contentFromGroup1('emoji'),
+    process: contentFromGroup('emoji'),
 }
 
-const BOLD: MarkRule<SlackMark> = {
-    pattern: /(?<=^|\W)\*(.+?)\*(?=\W|$)/,
-    process: textFromGroup1('bold'),
+export const BOLD: MarkRule<SlackMark> = {
+    pattern: /(^|\W)\*(.+?)\*(\W|$)/,
+    process: textFromGroup('bold', true, true),
 }
 
-const ITALIC: MarkRule<SlackMark> = {
-    pattern: /(?<=^|\W)_(.+?)_(?=\W|$)/,
-    process: textFromGroup1('italic'),
+export const ITALIC: MarkRule<SlackMark> = {
+    pattern: /(^|\W)_(.+?)_(\W|$)/,
+    process: textFromGroup('italic', true, true),
 }
 
-const STRIKE: MarkRule<SlackMark> = {
-    pattern: /(?<=^|\W)\~(.+?)\~(?=\W|$)/,
-    process: textFromGroup1('strike'),
+export const STRIKE: MarkRule<SlackMark> = {
+    pattern: /(^|\W)\~(.+?)\~(\W|$)/,
+    process: textFromGroup('strike', true, true),
 }
 
 const QUOTE_EXTRACT = /^>\s?/m
-const QUOTE: MarkRule<SlackMark> = {
-    pattern: /(?<=(?:^|\n))((?:\>[^\n]+?(?:\n|$))+)/m,
-    process: (m) => ({
+export const QUOTE: MarkRule<SlackMark> = {
+    pattern: /(^|\n)((?:(?:\>|\&gt\;)[^\n]+?(?:\n|$))+)/m,
+    process: (m, r) => ({
         mark: { name: 'quote', children: [] },
-        text: m[0].split(QUOTE_EXTRACT).join("")
+        text: extractGroupContent(m, r, true, false).split(QUOTE_EXTRACT).join("")
     }),
 }
 

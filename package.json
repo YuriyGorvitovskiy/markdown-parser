@@ -1,7 +1,7 @@
 {
     "name": "markdown-parser",
     "release": "Markdown Parser library",
-    "version": "3.3.8",
+    "version": "3.3.9",
     "description": "Markdown Parser library, with Slack support",
     "main": "src/index.ts",
     "keywords": [
