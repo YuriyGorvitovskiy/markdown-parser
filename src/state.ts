@@ -1,4 +1,4 @@
-import { Mark } from "./mark"
+import { Mark } from "./mark";
 /**
     1. Split string by pattern1: [text1, match2, text3, match4, text5]
     2  Create MarkTree: [text1, m2: [text2], text3, m4: [text4], text5]
@@ -36,80 +36,83 @@ import { Mark } from "./mark"
   */
 
 export interface Level<M extends string> {
-    readonly unprocessed: Mark<M>[]
-    readonly mark: Mark<M>
-    readonly secondary?: boolean
+    readonly unprocessed: Mark<M>[];
+    readonly mark: Mark<M>;
+    readonly secondary?: boolean;
 }
 
 // Alogorithm B Support
 export class State<M extends string> {
-    parents: Level<M>[]
-    current: Level<M>
-    active: Level<M>
+    parents: Level<M>[];
+    current: Level<M>;
+    active: Level<M>;
 
     constructor(parents: Level<M>[], current: Level<M>) {
-        this.parents = parents
-        this.current = current
-        this.active = null
+        this.parents = parents;
+        this.current = current;
+        this.active = null;
     }
 
     addText(text: string): State<M> {
         if (text) {
-            this.current.mark.children.push({ name: 'text', content: text })
+            this.current.mark.children.push({ name: "text", content: text });
         }
-        return this
+        return this;
     }
 
     addActiveMark(mark: Mark<M>): State<M> {
         // just open a new mark
-        this.parents.push(this.current)
-        this.active = this.current = { mark, unprocessed: this.current.unprocessed }
-        return this
+        this.parents.push(this.current);
+        this.active = this.current = { mark, unprocessed: this.current.unprocessed };
+        return this;
     }
 
     closeActiveMark(): State<M> {
-        const backup: Level<M>[] = []
+        const backup: Level<M>[] = [];
         // close all marks below active, and keep them in stack
         while (this.current !== this.active) {
-            backup.push(this.current)
+            backup.push(this.current);
             const ended = this.current;
-            this.current = this.parents.pop()
-            const mark = ended.mark
+            this.current = this.parents.pop();
+            const mark = ended.mark;
             if (!ended.secondary || mark.children?.length) {
                 // add only primary or not empty mark secondary
-                this.current.mark.children.push(mark)
+                this.current.mark.children.push(mark);
             }
         }
         // close active
         const ended = this.current;
-        this.current = this.parents.pop()
-        this.active = null
-        const mark = ended.mark
+        this.current = this.parents.pop();
+        this.active = null;
+        const mark = ended.mark;
         if (!ended.secondary || mark.children?.length) {
             // add only primary or not empty mark secondary
-            this.current.mark.children.push(mark)
+            this.current.mark.children.push(mark);
         }
 
         // reopen marks we preserved in stack in reverse order
         while (backup.length > 0) {
-            const back = backup.pop()
-            const repeat = { ...back.mark, children: [] }
-            this.parents.push(this.current)
-            this.current = { mark: repeat, unprocessed: back.unprocessed, secondary: true }
+            const back = backup.pop();
+            const repeat = { ...back.mark, children: [] };
+            this.parents.push(this.current);
+            this.current = { mark: repeat, unprocessed: back.unprocessed, secondary: true };
         }
-        return this
+        return this;
     }
 
     addProcessedMarks(levels: number): State<M> {
-        // Add unprocessed marks, recursively 
+        // Add unprocessed marks, recursively
         while (levels-- > 0) {
-            const next = this.current.unprocessed.shift()
-            const repeat = { ...next, children: next.unbreakable ? next.children : [] }
-            this.parents.push(this.current)
+            const next = this.current.unprocessed.shift();
+            const repeat = { ...next, children: next.unbreakable ? next.children : [] };
+            this.parents.push(this.current);
 
-            this.current = { mark: repeat, unprocessed: next.unbreakable ? [] : next.children?.filter(m => m.name !== 'text') }
+            this.current = {
+                mark: repeat,
+                unprocessed: next.unbreakable ? [] : next.children?.filter((m) => m.name !== "text"),
+            };
         }
-        return this
+        return this;
     }
 
     closeProcessedMarks(levels: number): State<M> {
@@ -119,44 +122,41 @@ export class State<M extends string> {
             if (this.active == this.current) {
                 // if there is an active mark, close it also, but don't count
                 const ended = this.current;
-                this.current = this.parents.pop()
-                const mark = ended.mark
+                this.current = this.parents.pop();
+                const mark = ended.mark;
                 if (!ended.secondary || mark.children?.length) {
                     // add only primary or not empty mark secondary
-                    this.current.mark.children.push(mark)
+                    this.current.mark.children.push(mark);
                 }
-                activeClosed = true
+                activeClosed = true;
             }
             const ended = this.current;
-            this.current = this.parents.pop()
-            const mark = ended.mark
+            this.current = this.parents.pop();
+            const mark = ended.mark;
             if (!ended.secondary || mark.children?.length) {
                 // add only primary or not empty mark secondary
-                this.current.mark.children.push(mark)
+                this.current.mark.children.push(mark);
             }
         }
 
         if (activeClosed) {
             // reopen active mark
-            const repeat = { ...this.active.mark, children: [] }
-            this.parents.push(this.current)
-            this.active = this.current = { mark: repeat, unprocessed: this.current.unprocessed, secondary: true }
+            const repeat = { ...this.active.mark, children: [] };
+            this.parents.push(this.current);
+            this.active = this.current = { mark: repeat, unprocessed: this.current.unprocessed, secondary: true };
         }
 
-        return this
+        return this;
     }
 
     getCurrentMark(): Mark<M> {
-        return this.current.mark
+        return this.current.mark;
     }
 
     static of<M extends string>(processedRoot: Mark<M>): State<M> {
         return new State([], {
             mark: { ...processedRoot, children: [] },
-            unprocessed: [...processedRoot.children.filter(m => m.name !== 'text')],
-        })
+            unprocessed: [...processedRoot.children.filter((m) => m.name !== "text")],
+        });
     }
 }
-
-
-

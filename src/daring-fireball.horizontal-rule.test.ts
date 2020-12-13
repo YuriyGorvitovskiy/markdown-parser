@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL } from "."
+import { parse, DARING_FIREBALL } from ".";
 
 test("Horizontal rules", () => {
     // Setup
@@ -10,21 +10,27 @@ test("Horizontal rules", () => {
     
     - - -
     
-    ---------------------------------------`
+    ---------------------------------------`;
 
     // Execute
-    const result = parse(source, DARING_FIREBALL)
+    const result = parse(source, DARING_FIREBALL);
 
     // Verify
-    expect(result.children).toMatchObject([{
-        name: 'horizontal-rule',
-    }, {
-        name: 'horizontal-rule',
-    }, {
-        name: 'horizontal-rule',
-    }, {
-        name: 'horizontal-rule',
-    }, {
-        name: 'horizontal-rule',
-    }])
-})
+    expect(result.children).toMatchObject([
+        {
+            name: "horizontal-rule",
+        },
+        {
+            name: "horizontal-rule",
+        },
+        {
+            name: "horizontal-rule",
+        },
+        {
+            name: "horizontal-rule",
+        },
+        {
+            name: "horizontal-rule",
+        },
+    ]);
+});
