@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Paragraph and code", () => {
     // Setup
@@ -6,7 +6,7 @@ test("Paragraph and code", () => {
 
     This is a code block.`
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -29,7 +29,7 @@ test("Paragraph and multiline code", () => {
 \t    beep
     end tell`
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -53,7 +53,7 @@ test("Code with HTML inside", () => {
     </div>`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -74,7 +74,7 @@ test("Code between qoutes", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

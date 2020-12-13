@@ -1,8 +1,8 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("HTML symbol with decimal code.", () => {
     // Execute
-    const result = parse("Winking: &#128521;", DARING_FIREBALL_RULES)
+    const result = parse("Winking: &#128521;", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -16,7 +16,7 @@ test("HTML symbol with decimal code.", () => {
 
 test("HTML symbol with &#x hex code.", () => {
     // Execute
-    const result = parse("Smirking: &#x1F60F;", DARING_FIREBALL_RULES)
+    const result = parse("Smirking: &#x1F60F;", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -30,7 +30,7 @@ test("HTML symbol with &#x hex code.", () => {
 
 test("HTML symbol with &#X hex code.", () => {
     // Execute
-    const result = parse("Grinning: &#X1F600;", DARING_FIREBALL_RULES)
+    const result = parse("Grinning: &#X1F600;", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -44,7 +44,7 @@ test("HTML symbol with &#X hex code.", () => {
 
 test("HTML symbol with named code.", () => {
     // Execute
-    const result = parse("Empty: &emptyset;", DARING_FIREBALL_RULES)
+    const result = parse("Empty: &emptyset;", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -58,7 +58,7 @@ test("HTML symbol with named code.", () => {
 
 test("HTML symbol standalone.", () => {
     // Execute
-    const result = parse("&copy;", DARING_FIREBALL_RULES)
+    const result = parse("&copy;", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -69,7 +69,7 @@ test("HTML symbol standalone.", () => {
 
 test("HTML symbol inside word.", () => {
     // Execute
-    const result = parse("http://images.google.com/images?num=30&amp;q=larry+bird", DARING_FIREBALL_RULES)
+    const result = parse("http://images.google.com/images?num=30&amp;q=larry+bird", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -86,7 +86,7 @@ test("HTML symbol inside word.", () => {
 
 test("HTML symbol not escaped 1.", () => {
     // Execute
-    const result = parse("AT&T", DARING_FIREBALL_RULES)
+    const result = parse("AT&T", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -97,7 +97,7 @@ test("HTML symbol not escaped 1.", () => {
 
 test("HTML symbol not escaped 2.", () => {
     // Execute
-    const result = parse("4 < 5", DARING_FIREBALL_RULES)
+    const result = parse("4 < 5", DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

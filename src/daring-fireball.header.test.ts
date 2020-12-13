@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Header with inderline markers", () => {
     // Setup
@@ -11,7 +11,7 @@ This is an H2
 -------------
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -47,7 +47,7 @@ test("Header with leading # markers", () => {
 
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -84,7 +84,7 @@ test("Header with leading and trailing # markers", () => {
 
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

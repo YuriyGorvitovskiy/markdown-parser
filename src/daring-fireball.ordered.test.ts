@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Ordered list with sequential numbers", () => {
     // Setup
@@ -7,7 +7,7 @@ test("Ordered list with sequential numbers", () => {
 3.  Parish`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -41,7 +41,7 @@ test("Ordered list with same number", () => {
 1. Parish`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -76,7 +76,7 @@ test("Ordered list with random numbers", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -117,7 +117,7 @@ test("Ordered list with indented paragraphs", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -157,7 +157,7 @@ test("Ordered list with long number", () => {
     const source = `1986. What a great season.`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -178,7 +178,7 @@ test("Like ordered list with . escaped", () => {
     const source = `1986\\. What a great season.`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

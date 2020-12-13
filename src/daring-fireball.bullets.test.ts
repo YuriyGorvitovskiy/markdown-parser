@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Bullets with stars", () => {
     // Setup
@@ -7,7 +7,7 @@ test("Bullets with stars", () => {
 *   Blue`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -41,7 +41,7 @@ test("Bullets with plus", () => {
 +   Blue`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -76,7 +76,7 @@ test("Bullets with dash", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -112,7 +112,7 @@ test("Bullets with indented text", () => {
     Suspendisse id sem consectetuer libero luctus adipiscing.`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -146,7 +146,7 @@ Suspendisse id sem consectetuer libero luctus adipiscing.
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -183,7 +183,7 @@ sit amet, consectetuer adipiscing elit.
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -224,7 +224,7 @@ test("Bullets with quote", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -256,7 +256,7 @@ test("Bullets with code", () => {
         <code goes here>`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

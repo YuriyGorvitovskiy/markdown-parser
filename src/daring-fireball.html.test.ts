@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("HTML Block", () => {
     // Setup
@@ -14,7 +14,7 @@ This is another regular paragraph.
 
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -64,7 +64,7 @@ test("HTML tags with content and text", () => {
     const source = '<a href="github.com" title="Link Title">GitHub</a>'
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -83,7 +83,7 @@ test("HTML singleton tags", () => {
     const source = '<b>Bold<br>Text</b>'
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -110,7 +110,7 @@ test("HTML nesteed tags.", () => {
     const source = '<table><tl><td>1</td><td>2</td></tl></table>'
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -141,14 +141,14 @@ test("HTML nesteed tags.", () => {
 
 test("HTML escaped symbols and entities.", () => {
     // Execute
-    const result1 = parse("Winking: &#128521;", DARING_FIREBALL_RULES)
-    const result2 = parse("Smirking: &#x1F60F;", DARING_FIREBALL_RULES)
-    const result3 = parse("Grinning: &#X1F600;", DARING_FIREBALL_RULES)
-    const result4 = parse("Empty: &emptyset;", DARING_FIREBALL_RULES)
-    const result5 = parse("http://images.google.com/images?num=30&amp;q=larry+bird", DARING_FIREBALL_RULES)
-    const result6 = parse("&copy;", DARING_FIREBALL_RULES)
-    const result7 = parse("AT&T", DARING_FIREBALL_RULES)
-    const result8 = parse("4 < 5", DARING_FIREBALL_RULES)
+    const result1 = parse("Winking: &#128521;", DARING_FIREBALL)
+    const result2 = parse("Smirking: &#x1F60F;", DARING_FIREBALL)
+    const result3 = parse("Grinning: &#X1F600;", DARING_FIREBALL)
+    const result4 = parse("Empty: &emptyset;", DARING_FIREBALL)
+    const result5 = parse("http://images.google.com/images?num=30&amp;q=larry+bird", DARING_FIREBALL)
+    const result6 = parse("&copy;", DARING_FIREBALL)
+    const result7 = parse("AT&T", DARING_FIREBALL)
+    const result8 = parse("4 < 5", DARING_FIREBALL)
 
     // Verify
     expect(result1.children).toMatchObject([{

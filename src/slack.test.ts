@@ -1,10 +1,10 @@
-import { parse, SLACK_RULES } from "."
+import { parse, SLACK } from "."
 
 // Test sets comes from https://github.com/rutan/slack_markdown/tree/master/spec/slack_markdown
 test("Slack code-block parser.", () => {
     // Execute
-    const result1 = parse("```\ndef hoge\n  1 + 1\nend\n```", SLACK_RULES)
-    const result2 = parse("```\ndef hoge\n  1 + 1\nend\n``` fuga ```\ndef piyo\n  1 * 1\nend\n```", SLACK_RULES)
+    const result1 = parse("```\ndef hoge\n  1 + 1\nend\n```", SLACK)
+    const result2 = parse("```\ndef hoge\n  1 + 1\nend\n``` fuga ```\ndef piyo\n  1 * 1\nend\n```", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -26,8 +26,8 @@ test("Slack code-block parser.", () => {
 
 test("Slack code-inline parser.", () => {
     // Execute
-    const result1 = parse("`hoge`", SLACK_RULES)
-    const result2 = parse("`hoge` fuga `piyo`", SLACK_RULES)
+    const result1 = parse("`hoge`", SLACK)
+    const result2 = parse("`hoge` fuga `piyo`", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -48,7 +48,7 @@ test("Slack code-inline parser.", () => {
 
 test("Slack link parser.", () => {
     // Execute
-    const result = parse("123 <!456> 789", SLACK_RULES)
+    const result = parse("123 <!456> 789", SLACK)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -65,7 +65,7 @@ test("Slack link parser.", () => {
 
 test("Slack link with text parser.", () => {
     // Execute
-    const result = parse("123 <!4|56> 789", SLACK_RULES)
+    const result = parse("123 <!4|56> 789", SLACK)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -86,7 +86,7 @@ test("Slack link with text parser.", () => {
 
 test("Slack emoji parser.", () => {
     // Execute
-    const result = parse("123:smile-456:789", SLACK_RULES)
+    const result = parse("123:smile-456:789", SLACK)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -103,9 +103,9 @@ test("Slack emoji parser.", () => {
 
 test("Slack 'quote' parser.", () => {
     // Execute
-    const result1 = parse("> 123", SLACK_RULES)
-    const result2 = parse("> 123\n> 456", SLACK_RULES)
-    const result3 = parse("> 123\n>456\n789\n> ABC", SLACK_RULES)
+    const result1 = parse("> 123", SLACK)
+    const result2 = parse("> 123\n> 456", SLACK)
+    const result3 = parse("> 123\n>456\n789\n> ABC", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -156,9 +156,9 @@ test("Slack 'quote' parser.", () => {
 
 test("Slack bold parser.", () => {
     // Execute
-    const result1 = parse("*hoge*", SLACK_RULES)
-    const result2 = parse("hoge*fuga*poyo", SLACK_RULES)
-    const result3 = parse("hoge *fuga* poyo", SLACK_RULES)
+    const result1 = parse("*hoge*", SLACK)
+    const result2 = parse("hoge*fuga*poyo", SLACK)
+    const result3 = parse("hoge *fuga* poyo", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -191,9 +191,9 @@ test("Slack bold parser.", () => {
 
 test("Slack italic parser.", () => {
     // Execute
-    const result1 = parse("_hoge_", SLACK_RULES)
-    const result2 = parse("hoge_fuga_poyo", SLACK_RULES)
-    const result3 = parse("hoge _fuga_ poyo", SLACK_RULES)
+    const result1 = parse("_hoge_", SLACK)
+    const result2 = parse("hoge_fuga_poyo", SLACK)
+    const result3 = parse("hoge _fuga_ poyo", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -226,9 +226,9 @@ test("Slack italic parser.", () => {
 
 test("Slack strike parser.", () => {
     // Execute
-    const result1 = parse("~hoge~", SLACK_RULES)
-    const result2 = parse("hoge~fuga~poyo", SLACK_RULES)
-    const result3 = parse("hoge ~fuga~ poyo", SLACK_RULES)
+    const result1 = parse("~hoge~", SLACK)
+    const result2 = parse("hoge~fuga~poyo", SLACK)
+    const result3 = parse("hoge ~fuga~ poyo", SLACK)
 
     // Verify
     expect(result1.children).toMatchObject([{
@@ -278,7 +278,7 @@ test("Slack parser", () => {
         "> :ru_shalm: ~is~ <http://toripota.com/img/ru_shalm.png|`Code💬`*Foxy* girl>"
 
     // Execute
-    const result = parse(markdown, SLACK_RULES)
+    const result = parse(markdown, SLACK)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -361,7 +361,7 @@ test("3 levels of intersection", () => {
     const markdown = "_italic *bold ~strike_ no-italic* no-bold~ no-strike"
 
     // Execute
-    const result = parse(markdown, SLACK_RULES)
+    const result = parse(markdown, SLACK)
 
     // Verify
     expect(result.children).toMatchObject([{

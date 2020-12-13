@@ -3,15 +3,15 @@ import { parse } from "./parser"
 
 type SL = 'bold' | 'italic' | 'code-inline'
 
-const BOLD: MarkRule<SL> = {
+const BOLD: MarkRule<SL, null> = {
     pattern: /(^|\W)\*(.+?)\*(\W|$)/,
     process: textFromGroup('bold', true, true)
 }
-const ITALIC: MarkRule<SL> = {
+const ITALIC: MarkRule<SL, null> = {
     pattern: /(^|\W)_(.+?)_(\W|$)/,
     process: textFromGroup('italic', true, true)
 }
-const CODE_INLINE: MarkRule<SL> = {
+const CODE_INLINE: MarkRule<SL, null> = {
     pattern: /\`(.+?)\`/,
     process: contentFromGroup('code-inline')
 }
@@ -33,7 +33,7 @@ const CODE_INLINE: MarkRule<SL> = {
 
 test("Parse with BOLD pattern", () => {
     // Execute
-    const result = parse("12 _34 *56_ _78* 90_ AB", [BOLD])
+    const result = parse("12 _34 *56_ _78* 90_ AB", {rules: [BOLD], context: ()=> null})
 
     // Verify 
     expect(result.children).toMatchObject([{
@@ -52,7 +52,7 @@ test("Parse with BOLD pattern", () => {
 })
 
 test("Parse with BOLD + ITALIC patterns", () => {
-    const result = parse("12 _34 *56_ _78* 90_ AB", [BOLD, ITALIC])
+    const result = parse("12 _34 *56_ _78* 90_ AB", {rules: [BOLD, ITALIC], context: ()=> null})
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -96,7 +96,7 @@ test("Parse with BOLD + ITALIC patterns", () => {
 
 test("Parse with CODE_INLINE + BOLD patterns V1", () => {
     // Execute
-    const result = parse("12 *34 `56 78*` 90* AB", [CODE_INLINE, BOLD])
+    const result = parse("12 *34 `56 78*` 90* AB", {rules: [CODE_INLINE, BOLD], context: ()=> null})
 
     // Verify 
     expect(result.children).toMatchObject([{
@@ -122,7 +122,7 @@ test("Parse with CODE_INLINE + BOLD patterns V1", () => {
 
 test("Parse with CODE_INLINE + BOLD patterns V2", () => {
     // Execute
-    const result = parse("12 *34 `56 78`* 90* AB", [CODE_INLINE, BOLD])
+    const result = parse("12 *34 `56 78`* 90* AB", {rules: [CODE_INLINE, BOLD], context: ()=> null})
 
     // Verify 
     expect(result.children).toMatchObject([{

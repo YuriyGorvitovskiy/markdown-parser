@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Block Quote with all lines marked", () => {
     // Setup
@@ -11,7 +11,7 @@ test("Block Quote with all lines marked", () => {
 >
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -46,7 +46,7 @@ id sem consectetuer libero luctus adipiscing.
 
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -80,7 +80,7 @@ test("Block Quote with inner quote", () => {
 
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -123,7 +123,7 @@ test("Block Quote of Header List and Code", () => {
 >     return shell_exec("echo $input | $markdown_script");
 `
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{

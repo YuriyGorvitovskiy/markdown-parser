@@ -1,4 +1,4 @@
-import { parse, DARING_FIREBALL_RULES } from "."
+import { parse, DARING_FIREBALL } from "."
 
 test("Link with title and without title.", () => {
     // Setup
@@ -8,7 +8,7 @@ test("Link with title and without title.", () => {
 `
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -50,7 +50,7 @@ test("Link with relative path.", () => {
     const source = `See my [About](/about/) page for details.`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -77,7 +77,7 @@ than from [Yahoo](http://search.yahoo.com/ "Yahoo Search") or
 [MSN](http://search.msn.com/ "MSN Search").`
 
     // Execute
-    const result = parse(source, DARING_FIREBALL_RULES)
+    const result = parse(source, DARING_FIREBALL)
 
     // Verify
     expect(result.children).toMatchObject([{
@@ -118,5 +118,426 @@ than from `,
     }, {
         name: 'text',
         content: ".",
+    }])
+})
+
+test("Referenced Link with title.", () => {
+    // Setup
+    const source = `This is [an example][id] reference-style link.
+[id]: http://example.com/  "Optional Title Here"`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: "Optional Title Here",
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link without title.", () => {
+    // Setup
+    const source = `This is [an example] [id] reference-style link.
+[id]: http://example.com/`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: undefined,
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with title in single quote.", () => {
+    // Setup
+    const source = `This is [an example][id] reference-style link.
+[id]: http://example.com/  'Optional "Title" Here'`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: `Optional "Title" Here`,
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with title in parentheses.", () => {
+    // Setup
+    const source = `This is [an example][id] reference-style link.
+[id]: http://example.com/ (Optional Title Here)`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: "Optional Title Here",
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with url in angle brackets.", () => {
+    // Setup
+    const source = `This is [an example][id] reference-style link.
+[id]: <http://example.com/>  "Optional Title Here"`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: "Optional Title Here",
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with title on next line.", () => {
+    // Setup
+    const source = `This is [an example][id] reference-style link.
+[id]: http://example.com/longish/path/to/resource/here
+    "Optional Title Here"`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/longish/path/to/resource/here",
+            title: "Optional Title Here",
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with case insensitive id.", () => {
+    // Setup
+    const source = `This is [an example][id.CaSe] reference-style link.
+[ID.case]: http://example.com/`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "This is ",
+        }, {
+            name: 'link',
+            content: "http://example.com/",
+            title: undefined,
+            children: [{
+                name: 'text',
+                content: "an example"
+            }]
+        }, {
+            name: 'text',
+            content: ` reference-style link.`,
+        }]
+    }])
+})
+
+test("Referenced Link with implicit id.", () => {
+    // Setup
+    const source = `[Google][]
+[Google]: http://google.com/`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'link',
+            content: "http://google.com/",
+            title: undefined,
+            children: [{
+                name: 'text',
+                content: "Google"
+            }]
+        }]
+    }])
+})
+
+test("Referenced Link with implicit id with space.", () => {
+    // Setup
+    const source = `Visit [Daring Fireball][] for more information.
+[Daring Fireball]: http://daringfireball.net/`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "Visit ",
+        }, {
+            name: 'link',
+            content: "http://daringfireball.net/",
+            title: undefined,
+            children: [{
+                name: 'text',
+                content: "Daring Fireball"
+            }]
+        }, {
+            name: 'text',
+            content: ` for more information.`,
+        }]
+    }])
+})
+
+test("Referenced Link with multiple definitions.", () => {
+    // Setup
+    const source = `I get 10 times more traffic from [Google] [1] than from
+[Yahoo] [2] or [MSN] [3].
+
+[1]: http://google.com/        "Google"
+[2]: http://search.yahoo.com/  "Yahoo Search"
+[3]: http://search.msn.com/    "MSN Search"`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "I get 10 times more traffic from ",
+        }, {
+            name: 'link',
+            content: "http://google.com/",
+            title: "Google",
+            children: [{
+                name: 'text',
+                content: "Google"
+            }]
+        }, {
+            name: 'text',
+            content: ` than from
+`,
+        }, {
+            name: 'link',
+            content: "http://search.yahoo.com/",
+            title: "Yahoo Search",
+            children: [{
+                name: 'text',
+                content: "Yahoo"
+            }]
+        }, {
+            name: 'text',
+            content: ` or `,
+        }, {
+            name: 'link',
+            content: "http://search.msn.com/",
+            title: "MSN Search",
+            children: [{
+                name: 'text',
+                content: "MSN"
+            }]
+        }, {
+            name: 'text',
+            content: `.`,
+        }]
+    }])
+})
+
+test("Referenced Link with multiple definitions with implicit id.", () => {
+    // Setup
+    const source = `I get 10 times more traffic from [Google][] than from
+[Yahoo][] or [MSN][].
+
+[google]: http://google.com/        "Google"
+[yahoo]:  http://search.yahoo.com/  "Yahoo Search"
+[msn]:    http://search.msn.com/    "MSN Search"`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "I get 10 times more traffic from ",
+        }, {
+            name: 'link',
+            content: "http://google.com/",
+            title: "Google",
+            children: [{
+                name: 'text',
+                content: "Google"
+            }]
+        }, {
+            name: 'text',
+            content: ` than from
+`,
+        }, {
+            name: 'link',
+            content: "http://search.yahoo.com/",
+            title: "Yahoo Search",
+            children: [{
+                name: 'text',
+                content: "Yahoo"
+            }]
+        }, {
+            name: 'text',
+            content: ` or `,
+        }, {
+            name: 'link',
+            content: "http://search.msn.com/",
+            title: "MSN Search",
+            children: [{
+                name: 'text',
+                content: "MSN"
+            }]
+        }, {
+            name: 'text',
+            content: `.`,
+        }]
+    }])
+})
+
+test("Multiple Link.", () => {
+    // Setup
+    const source = `I get 10 times more traffic from [Google](http://google.com/ "Google") than from
+[Yahoo](http://search.yahoo.com/ "Yahoo Search") or [MSN](http://search.msn.com/ "MSN Search").
+`
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL)
+
+    // Verify
+    expect(result.children).toMatchObject([{
+        name: "paragraph",
+        children: [{
+            name: 'text',
+            content: "I get 10 times more traffic from ",
+        }, {
+            name: 'link',
+            content: "http://google.com/",
+            title: "Google",
+            children: [{
+                name: 'text',
+                content: "Google"
+            }]
+        }, {
+            name: 'text',
+            content: ` than from
+`,
+        }, {
+            name: 'link',
+            content: "http://search.yahoo.com/",
+            title: "Yahoo Search",
+            children: [{
+                name: 'text',
+                content: "Yahoo"
+            }]
+        }, {
+            name: 'text',
+            content: ` or `,
+        }, {
+            name: 'link',
+            content: "http://search.msn.com/",
+            title: "MSN Search",
+            children: [{
+                name: 'text',
+                content: "MSN"
+            }]
+        }, {
+            name: 'text',
+            content: `.`,
+        }]
     }])
 })

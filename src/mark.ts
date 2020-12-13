@@ -9,11 +9,16 @@ export interface Mark<M extends string> {
  * Because Safari and FireFox are not supporting lookbehind and lookahead Regular Expressions, 
  * we should pass match and regex to the process function, to be able to ajust match.index and regex.lastIndex
  */
-type PatternHandler<M extends string> = (match: RegExpExecArray, regexp: RegExp) => { mark: Mark<M>, text: string };
+type PatternHandler<M extends string, C> = (match: RegExpExecArray, regexp: RegExp, ctx: C) => { mark: Mark<M>, text: string };
 
-export interface MarkRule<M extends string> {
+export interface MarkRule<M extends string, C> {
     readonly pattern: RegExp
-    readonly process: PatternHandler<M>
+    readonly process: PatternHandler<M, C>
+}
+
+export interface Markdown<M extends string, C> {
+    rules: MarkRule<M, C>[]
+    context: () => C 
 }
 
 export const extractGroupContent = (match, regex, lookbehind?: boolean, lookahead?: boolean) => {
@@ -28,13 +33,13 @@ export const extractGroupContent = (match, regex, lookbehind?: boolean, lookahea
     return content;
 }
 
-export const contentFromGroup = <M extends string>(name: M, lookbehind?: boolean, lookahead?: boolean): PatternHandler<M> =>
+export const contentFromGroup = <M extends string, C>(name: M, lookbehind?: boolean, lookahead?: boolean): PatternHandler<M, C> =>
     ((match, regex) => ({
         mark: { name, content: extractGroupContent(match, regex, lookbehind, lookahead) },
         text: null
     }))
 
-export const textFromGroup = <M extends string>(name: M, lookbehind?: boolean, lookahead?: boolean): PatternHandler<M> =>
+export const textFromGroup = <M extends string, C>(name: M, lookbehind?: boolean, lookahead?: boolean): PatternHandler<M, C> =>
     ((match, regex) => ({
         mark: { name, children: [] },
         text: extractGroupContent(match, regex, lookbehind, lookahead)
