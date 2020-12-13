@@ -1,6 +1,6 @@
 import { match } from "assert"
 import HTML_ENTITY_LOOKUP from "./html-entities"
-import { Mark, MarkRule } from "./mark"
+import { Mark, MarkRule, extractGroupContent } from "./mark"
 import { parse } from "./parser"
 
 export type DaringFireballMark = 'bullet-list' | 'code' | 'escaped' | 'header' | 'horizontal-rule' | 'html-block' | 'html-tag' | 'line-break' | 'link' | 'list-item' | 'ordered-list' | 'quote' | 'paragraph'
@@ -61,11 +61,11 @@ const HTML_SINGLETON_TAG: MarkRule<DaringFireballMark> = {
 
 const QUOTE: MarkRule<DaringFireballMark> = {
     //pattern: /^(> ?[^\u001D\u001E]*?(?:\n[ \t]*)+(?:\n|$))/m,
-    pattern: /(?<=^|\u001E)((?:>(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)+)/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)((?:>(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)+)/m,
+    process: (match, regex) => ({
         mark: {
             name: 'quote',
-            children: parse(match[1].replace(/^\> ?/gm, ""), RECURSIVE_RULES).children,
+            children: parse(extractGroupContent(match, regex, true, false).replace(/^\> ?/gm, ""), RECURSIVE_RULES).children,
             unbreakable: true,
         },
         text: ""
@@ -75,15 +75,15 @@ const QUOTE: MarkRule<DaringFireballMark> = {
 const trimLastLineBreak = (s: string) => s.endsWith('\n') ? s.substr(0, s.length - 1) : s
 
 const BULLET_LIST: MarkRule<DaringFireballMark> = {
-    // start with (?<=^|\u001E)(?: {0,3}|\t)[*+-][ \t]
+    // start with (^|\u001E)(?: {0,3}|\t)[*+-][ \t]
     // continue: (?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t)
     // paragraph line: (?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*\n)*
     // paragraph ending: (?:[ \t]*\n)*
-    pattern: /(?<=^|\u001E)((?: {0,3}|\t)[*+-][ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)((?: {0,3}|\t)[*+-][ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
+    process: (match, regex) => ({
         mark: {
             name: 'bullet-list',
-            children: match[1].split(/^(?: {0,3}|\t)[*+-](?: {0,3}|\t)/gm)
+            children: extractGroupContent(match, regex, true, false).split(/^(?: {0,3}|\t)[*+-](?: {0,3}|\t)/gm)
                 .slice(1)
                 .map(t => ({
                     name: 'list-item',
@@ -97,15 +97,15 @@ const BULLET_LIST: MarkRule<DaringFireballMark> = {
 }
 
 const ORDERED_LIST: MarkRule<DaringFireballMark> = {
-    // start with (?<=^|\u001E)(?: {0,3}|\t)[*+-][ \t]
+    // start with (^|\u001E)(?: {0,3}|\t)[*+-][ \t]
     // continue: (?:(?: {0,3}|\t)[*+-][ \t]|(?:    |\t)
     // paragraph line: (?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*\n)*
     // paragraph ending: (?:[ \t]*\n)*
-    pattern: /(?<=^|\u001E)((?: {0,3}|\t)\d+\.[ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)\d+\.[ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)((?: {0,3}|\t)\d+\.[ \t](?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*(?:(?:(?: {0,3}|\t)\d+\.[ \t]|(?:    |\t))(?:[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))*(?:[ \t]*\n)*)*)+/m,
+    process: (match, regex) => ({
         mark: {
             name: 'ordered-list',
-            children: match[1].split(/^(?: {0,3}|\t)\d+\.(?: {0,3}|\t)/gm)
+            children: extractGroupContent(match, regex, true, false).split(/^(?: {0,3}|\t)\d+\.(?: {0,3}|\t)/gm)
                 .slice(1)
                 .map(t => ({
                     name: 'list-item',
@@ -119,22 +119,22 @@ const ORDERED_LIST: MarkRule<DaringFireballMark> = {
 }
 
 const CODE: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E)((?:(?:    |\t)[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?:    |\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)((?:(?:    |\t)[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?:    |\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
+    process: (match, regex) => ({
         mark: {
             name: 'code',
-            content: match[1].replace(/^(?:    |\t)/gm, ""),
+            content: extractGroupContent(match, regex, true, false).replace(/^(?:    |\t)/gm, ""),
         },
         text: "",
     })
 }
 
 const PARAGRAPH: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+(?:\n|$)/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)(?:[ \t]*\n)*([^\u001D\u001E]+?)(?:\n[ \t]*)+(?:\n|$)/m,
+    process: (match, regex) => ({
         mark: {
             name: 'paragraph',
-            children: parse(match[1], INLINE_RULES).children,
+            children: parse(extractGroupContent(match, regex, true, false), INLINE_RULES).children,
             unbreakable: true,
         } as HtmlTagMark,
         text: "",
@@ -144,12 +144,12 @@ const PARAGRAPH: MarkRule<DaringFireballMark> = {
 
 // We should capture \n at the end to avoid paragraph around header
 const HEADER_UNDERLINE: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E)([^\s\u001D\u001E][^\n\u001D\u001E]*?)\n(=+|-+)(?:\n[ \t]*)+(?:\n|$)/m,
-    process: (match) => ({
+    pattern: /(^|\u001E)([^\s\u001D\u001E][^\n\u001D\u001E]*?)\n(=+|-+)(?:\n[ \t]*)+(?:\n|$)/m,
+    process: (match, regex) => ({
         mark: {
             name: 'header',
-            content: match[2].startsWith("=") ? "1" : "2",
-            children: parse(match[1], INLINE_RULES).children,
+            content: match[3].startsWith("=") ? "1" : "2",
+            children: parse(extractGroupContent(match, regex, true, false), INLINE_RULES).children,
             unbreakable: true,
         } as HeaderMark,
         text: "",
@@ -158,12 +158,12 @@ const HEADER_UNDERLINE: MarkRule<DaringFireballMark> = {
 
 // We should capture \n at the end to avoid paragraph around header
 const HEADER_SHARP: MarkRule<DaringFireballMark> = {
-    pattern: /(?<=^|\u001E\n)(#{1,6})[ \t]+([^\s\u001D\u001E][^\n\u001D\u001E]*?)(?:[ \t]+#+)?(?:\n[ \t]*)+(?:\n|$)/m,
-    process: (match) => ({
+    pattern: /(^|\u001E\n)(#{1,6})[ \t]+([^\s\u001D\u001E][^\n\u001D\u001E]*?)(?:[ \t]+#+)?(?:\n[ \t]*)+(?:\n|$)/m,
+    process: (match, regex) => ({
         mark: {
             name: 'header',
-            content: "" + match[1].length,
-            children: parse(match[2], INLINE_RULES).children,
+            content: "" + extractGroupContent(match, regex, true, false).length,
+            children: parse(match[3], INLINE_RULES).children,
             unbreakable: true,
         } as HeaderMark,
         text: "",
