@@ -181,3 +181,11 @@ test("Parse with CODE_INLINE + BOLD patterns V2", () => {
         },
     ]);
 });
+
+test("Empty string to parse", () => {
+    // Execute
+    const result = parse("", { rules: [CODE_INLINE, BOLD], context: () => null });
+
+    // Verify
+    expect(result.children).toMatchObject([]);
+});

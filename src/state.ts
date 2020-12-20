@@ -72,23 +72,11 @@ export class State<M extends string> {
         // close all marks below active, and keep them in stack
         while (this.current !== this.active) {
             backup.push(this.current);
-            const ended = this.current;
-            this.current = this.parents.pop();
-            const mark = ended.mark;
-            if (!ended.secondary || mark.children?.length) {
-                // add only primary or not empty mark secondary
-                this.current.mark.children.push(mark);
-            }
+            this.closeCurrent();
         }
         // close active
-        const ended = this.current;
-        this.current = this.parents.pop();
+        this.closeCurrent();
         this.active = null;
-        const mark = ended.mark;
-        if (!ended.secondary || mark.children?.length) {
-            // add only primary or not empty mark secondary
-            this.current.mark.children.push(mark);
-        }
 
         // reopen marks we preserved in stack in reverse order
         while (backup.length > 0) {
@@ -121,22 +109,10 @@ export class State<M extends string> {
         while (levels-- > 0) {
             if (this.active == this.current) {
                 // if there is an active mark, close it also, but don't count
-                const ended = this.current;
-                this.current = this.parents.pop();
-                const mark = ended.mark;
-                if (!ended.secondary || mark.children?.length) {
-                    // add only primary or not empty mark secondary
-                    this.current.mark.children.push(mark);
-                }
+                this.closeCurrent();
                 activeClosed = true;
             }
-            const ended = this.current;
-            this.current = this.parents.pop();
-            const mark = ended.mark;
-            if (!ended.secondary || mark.children?.length) {
-                // add only primary or not empty mark secondary
-                this.current.mark.children.push(mark);
-            }
+            this.closeCurrent();
         }
 
         if (activeClosed) {
@@ -151,6 +127,16 @@ export class State<M extends string> {
 
     getCurrentMark(): Mark<M> {
         return this.current.mark;
+    }
+
+    private closeCurrent(): void {
+        const ended = this.current;
+        this.current = this.parents.pop();
+        const mark = ended.mark;
+        if (!ended.secondary || mark.children.length) {
+            // add only primary or not empty mark secondary
+            this.current.mark.children.push(mark);
+        }
     }
 
     static of<M extends string>(processedRoot: Mark<M>): State<M> {
