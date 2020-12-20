@@ -134,6 +134,3 @@ https://api.slack.com/reference/surfaces/formatting
 
 https://daringfireball.net/projects/markdown/syntax
 
-## GitHub 
-
-https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown
