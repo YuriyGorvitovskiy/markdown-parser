@@ -1,7 +1,7 @@
 {
     "name": "markdown-parser",
     "release": "Markdown Parser library",
-    "version": "3.3.12",
+    "version": "3.3.13",
     "description": "Markdown Parser library, with Slack support",
     "main": "src/index.ts",
     "keywords": [
@@ -31,12 +31,12 @@
     "dependencies": {},
     "devDependencies": {
         "@types/jest": "26.0.19",
-        "@types/node": "14.14.13",
-        "@typescript-eslint/eslint-plugin": "4.9.1",
-        "@typescript-eslint/parser": "4.9.1",
-        "eslint": "7.15.0",
-        "eslint-config-prettier": "7.0.0",
-        "eslint-plugin-prettier": "3.2.0",
+        "@types/node": "14.14.14",
+        "@typescript-eslint/eslint-plugin": "4.10.0",
+        "@typescript-eslint/parser": "4.10.0",
+        "eslint": "7.16.0",
+        "eslint-config-prettier": "7.1.0",
+        "eslint-plugin-prettier": "3.3.0",
         "jest": "26.6.3",
         "npm-check-updates": "10.2.5",
         "prettier": "2.2.1",

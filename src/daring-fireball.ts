@@ -5,10 +5,12 @@ import { parse } from "./parser";
 export type DaringFireballMark =
     | "bullet-list"
     | "code-block"
+    | "code-inline"
     | "emphasis"
     | "escaped"
     | "header"
     | "horizontal-rule"
+    | "image"
     | "html-tag"
     | "line-break"
     | "link"
@@ -145,7 +147,7 @@ const ORDERED_LIST: MarkRule<DaringFireballMark, Context> = {
     }),
 };
 
-const CODE: MarkRule<DaringFireballMark, Context> = {
+const CODE_BLOCK: MarkRule<DaringFireballMark, Context> = {
     pattern: /(^|\u001E)((?:(?: {4}|\t)[^\n\u001D\u001E]*[^\s\u001D\u001E][^\n\u001D\u001E]*(?:\n|$))(?:^(?: {4}|\t)[^\n\u001D\u001E]+(?:\n|$)|(?:^[ \t]*(?:\n|$)))*)/m,
     process: (match, regex) => ({
         mark: {
@@ -208,26 +210,42 @@ const LINE_BREAK: MarkRule<DaringFireballMark, Context> = {
     process: () => ({ mark: { name: "line-break" }, text: "" }),
 };
 
-const LINK_INLINE: MarkRule<DaringFireballMark, Context> = {
-    pattern: /\[(.*?)\]\s*\(([^\s\u001D\u001E]+?)(?:\s+"([^"\u001D\u001E]*)")?\s*\)/m,
+const LINK_AUTOMATIC: MarkRule<DaringFireballMark, Context> = {
+    pattern: /<(?:((?:https?|ftp):\/\/[^\u001D\u001E]+?)|([\w._%+-]+@[\w.-]+\.\w+))>/,
     process: (match) => ({
         mark: {
             name: "link",
-            content: match[2],
-            title: match[3],
+            content: match[1] || "mailto:" + match[2],
             children: [],
         } as LinkMark,
-        text: match[1],
+        text: match[1] || match[2],
+    }),
+};
+
+const LINK_INLINE: MarkRule<DaringFireballMark, Context> = {
+    pattern: /(!)?\[(.*?)\]\s*\(([^\s\u001D\u001E]+?)(?:\s+"([^"\u001D\u001E]*)")?\s*\)/m,
+    process: (match) => ({
+        mark: {
+            name: match[1] ? "image" : "link",
+            content: match[3],
+            title: match[4],
+            children: [],
+        } as LinkMark,
+        text: match[2],
     }),
 };
 
 const LINK_REFERENCE: MarkRule<DaringFireballMark, Context> = {
-    pattern: /(\[([^\]]*)\]\s?\[([.,/#!$%^&*;:{}=\-_`~()\w ]*)\])/m,
+    pattern: /(!?\[([^\]]*)\]\s?\[([.,/#!$%^&*;:{}=\-_`~()\w ]*)\])/m,
     process: (match, _regex, ctx) => {
         const definition = ctx.links[(match[3] || match[2]).toLowerCase()];
         return definition
             ? {
-                  mark: { name: "link", ...definition, children: [] } as LinkMark,
+                  mark: {
+                      name: match[1].startsWith("!") ? "image" : "link",
+                      ...definition,
+                      children: [],
+                  } as LinkMark,
                   text: match[2],
               }
             : {
@@ -270,6 +288,17 @@ const EMPHASIS: MarkRule<DaringFireballMark, Context> = {
     }),
 };
 
+const CODE_INLINE: MarkRule<DaringFireballMark, Context> = {
+    pattern: /(`{1,2}) ?([^\u001D\u001E]+?) ?\1/m,
+    process: (match) => ({
+        mark: {
+            name: "code-inline",
+            content: match[2],
+        },
+        text: "",
+    }),
+};
+
 const HTML_ESCAPE: MarkRule<DaringFireballMark, Context> = {
     pattern: /&(?:(?:#)(\d+)|(?:#[xX])([\da-fA-F]+)|(\w+));/,
     process: (match) => ({
@@ -305,15 +334,17 @@ const BLOCK_RULES = [
     HORIZONTAL_RULE, // should be before BULLET_LIST
     BULLET_LIST,
     ORDERED_LIST,
-    CODE,
+    CODE_BLOCK,
     PARAGRAPH,
 ];
 
 const INLINE_RULES = [
     BACKSLASH_ESCAPE,
     LINE_BREAK,
+    CODE_INLINE,
     HTML_TAG,
     HTML_SINGLETON_TAG,
+    LINK_AUTOMATIC,
     LINK_INLINE,
     LINK_REFERENCE,
     STRONG,

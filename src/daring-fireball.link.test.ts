@@ -625,6 +625,28 @@ test("Referenced Link with multiple definitions with implicit id.", () => {
     ]);
 });
 
+test("Referenced Link doesn't exist", () => {
+    // Setup
+    const source = `[link text][A]
+`;
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL);
+
+    // Verify
+    expect(result.children).toMatchObject([
+        {
+            name: "paragraph",
+            children: [
+                {
+                    name: "text",
+                    content: "[link text][A]",
+                },
+            ],
+        },
+    ]);
+});
+
 test("Multiple Link.", () => {
     // Setup
     const source = `I get 10 times more traffic from [Google](http://google.com/ "Google") than from
@@ -688,6 +710,62 @@ test("Multiple Link.", () => {
                 {
                     name: "text",
                     content: `.`,
+                },
+            ],
+        },
+    ]);
+});
+
+test("Automaic links", () => {
+    // Setup
+    const source = `<http://example.com/>
+`;
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL);
+
+    // Verify
+    expect(result.children).toMatchObject([
+        {
+            name: "paragraph",
+            children: [
+                {
+                    name: "link",
+                    content: "http://example.com/",
+                    children: [
+                        {
+                            name: "text",
+                            content: "http://example.com/",
+                        },
+                    ],
+                },
+            ],
+        },
+    ]);
+});
+
+test("Automaic mailto links", () => {
+    // Setup
+    const source = `<address@example.com>
+`;
+
+    // Execute
+    const result = parse(source, DARING_FIREBALL);
+
+    // Verify
+    expect(result.children).toMatchObject([
+        {
+            name: "paragraph",
+            children: [
+                {
+                    name: "link",
+                    content: "mailto:address@example.com",
+                    children: [
+                        {
+                            name: "text",
+                            content: "address@example.com",
+                        },
+                    ],
                 },
             ],
         },
